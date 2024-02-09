@@ -1,0 +1,31 @@
+
+
+body {
+    font-family: 'calibri', sans-serif;
+    text-align: center;
+    margin: 20px;
+    padding: 60px;
+}
+
+h1, h2 {
+    margin-bottom: 10px;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+hr {
+    margin: 20px 0;
+}
+
+ul, ol {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+li {
+    margin-bottom: 5px;
+}
