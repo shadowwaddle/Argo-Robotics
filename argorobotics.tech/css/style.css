@@ -108,4 +108,5 @@ textarea{
     margin: 0;
     background-color: #003366;
     border: 0;
+    resize: none;
 }
