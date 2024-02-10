@@ -22,6 +22,8 @@ h2 {
 img {
     margin: auto;
     display: block;
+    width: 50%;
+    height: auto;
 }
 
 hr {
