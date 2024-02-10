@@ -15,7 +15,8 @@ h1 {
 }
 
 h2 {
-    padding: 10px 0;
+    margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 img {
