@@ -12,6 +12,7 @@ h1 {
     margin: 0;
     padding: 20px 0;
     text-align: center;
+    font-size: large;
 }
 
 h2 {
@@ -22,7 +23,7 @@ h2 {
 img {
     margin: auto;
     display: block;
-    width: 25%;
+    width: 10%;
     height: auto;
 }
 
