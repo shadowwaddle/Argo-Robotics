@@ -103,3 +103,8 @@ ul, ol {
 li {
     margin-bottom: 5px;
 }
+
+textarea{
+    padding: 0;
+    color: #007BFF;
+}
