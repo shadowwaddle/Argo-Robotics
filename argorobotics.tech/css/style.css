@@ -98,6 +98,8 @@ hr {
 ul, ol {
     text-align: left;
     margin-bottom: 20px;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 li {
