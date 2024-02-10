@@ -105,5 +105,6 @@ li {
 }
 
 textarea{
-    padding: 0;
+    margin: 0;
+    background-color: #007BFF;
 }
