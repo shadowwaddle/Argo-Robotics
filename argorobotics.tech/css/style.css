@@ -89,8 +89,8 @@ hr {
 .logo {
     height: 75px; /* Adjust based on your logo's size */
     margin-right: 20px; /* Adds space between the logo and the heading */
-    margin-top: 3px;
-    margin-bottom: 3px;
+    margin-top: none;
+    margin-bottom: none;
 }
 .content {
     padding-top: 70px; /* Adds padding to top of content to avoid being hidden by the fixed header */
