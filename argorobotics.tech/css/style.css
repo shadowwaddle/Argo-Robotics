@@ -109,8 +109,8 @@ textarea{
     background-color: #003366;
     border: 0;
     resize: none;
-    width: auto;
-    height: auto;
+    width: 100;
+    height: 25;
     font-size: large;
     color: #7AB8F2;
 }
