@@ -19,6 +19,13 @@ h1 {
 h2 {
     margin: 0;
     padding: 10px 0;
+    font-size: 85px;
+}
+
+h3 {
+    margin: 0;
+    padding: 10px 0;
+    font-size: 75px;
 }
 
 p {
@@ -36,17 +43,34 @@ p2 {
 }
 
 img {
+    margin: 20px;
     border-image: auto;
     margin: auto;
     display: block;
-    width: 300px;
+    width: auto;
     height: 300px;
 }
 
 hr {
     margin: 10px 0;
+    margin-top: 30px;
     border: none;
     border: 4px solid #007BFF;
+}
+
+
+.grid-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+.grid-item {
+    width: calc(33.333% - 10px); /* Adjust the subtraction value based on the total margin */
+    margin: 5px; /* This adds a total of 10px margin around each item */
+}
+.grid-item img {
+    width: 100%;
+    height: auto;
 }
 
 ul, ol {
