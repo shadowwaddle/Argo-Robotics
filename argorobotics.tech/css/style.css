@@ -109,4 +109,6 @@ textarea{
     background-color: #003366;
     border: 0;
     resize: none;
+    width: auto;
+    height: auto;
 }
