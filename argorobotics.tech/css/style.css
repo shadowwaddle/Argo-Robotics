@@ -111,4 +111,6 @@ textarea{
     resize: none;
     width: auto;
     height: auto;
+    font-size: large;
+    color: #7AB8F2;
 }
