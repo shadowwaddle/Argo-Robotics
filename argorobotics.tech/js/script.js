@@ -1,6 +1,3 @@
-let slideIndex = 1;
-showSlides(slideIndex);
-
 function plusSlides(n, slideshowId) {
     showSlides(slideIndex[slideshowId] += n, slideshowId);
 }
