@@ -1,117 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="css/style.css">
+<script src="js/script.js"></script>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Argo Robotics</title>
-    <link rel="stylesheet" href="css/style.css" />
-  </head>
+</head>
 
-  <body>
-    <div class="fixed-header">
-      <h3>Argo</h3>
+<div class="fixed-header">
+    <h3> Argo </h3>
 
-      <button>About Us</button>
-      <button>Branding/Merch</button>
-      <button>Our Workshops</button>
-      <img src="css/Images/Argo Logo Transparent.png" alt="Logo" class="logo" />
-    </div>
+    <button>About Us</button>
+    <button>Branding/Merch</button>
+    <button>Our Workshops</button>
+    <img src="css/Images/Argo Logo Transparent.png" alt="Logo" class="logo">
+</div>
+
+<body>
     <h1>Argo Robotics</h1>
-    <hr />
-    <p>
-      Meet Argo Robotics: a passionate assembly of fifteen high school robotics
-      enthusiasts united by a shared vision of innovation and technological
-      exploration. Hailing from diverse backgrounds, each member brings a unique
-      set of skills and perspectives to the table, fostering an environment
-      where creativity and engineering prowess flourish. Together, we embark on
-      a journey of discovery, pushing the boundaries of what's possible in the
-      world of robotics. Our commitment to excellence, teamwork, and the
-      relentless pursuit of challenges makes us not just a team, but a family
-      dedicated to shaping the future, one robot at a time.
-    </p>
-    <p2
-      >Argo is on a mission that transcends the mere assembly of circuits and
-      gears; we are here to build more than just robots—we are here to construct
-      a vibrant, inclusive community. Our ambition stretches beyond the
-      competition arena, aiming to empower, educate, and inspire. With a roster
-      of fifteen enthusiastic high school members at its core, Team Argo is
-      committed to holding workshops and courses that open the fascinating world
-      of robotics to everyone in our community. Through these initiatives, we
-      strive to demystify technology, fostering an environment where curiosity
-      leads to discovery and learning becomes a shared adventure. By nurturing
-      skills, confidence, and a collaborative spirit, we aim not only to excel
-      in robotics but to contribute positively to our world, making technology
-      accessible and enjoyable for all. Our journey is about creating
-      connections, sharing knowledge, and sparking a passion for innovation that
-      will drive us toward a brighter, more inclusive future.</p2
-    >
-    <hr />
+    <hr>
+    <p>Meet Argo Robotics: a passionate assembly of fifteen high school robotics enthusiasts united by a shared vision of innovation and technological exploration. Hailing from diverse backgrounds, each member brings a unique set of skills and perspectives to the table, fostering an environment where creativity and engineering prowess flourish. Together, we embark on a journey of discovery, pushing the boundaries of what's possible in the world of robotics. Our commitment to excellence, teamwork, and the relentless pursuit of challenges makes us not just a team, but a family dedicated to shaping the future, one robot at a time.</p>
+    <p2>Argo is on a mission that transcends the mere assembly of circuits and gears; we are here to build more than just robots—we are here to construct a vibrant, inclusive community. Our ambition stretches beyond the competition arena, aiming to empower, educate, and inspire. With a roster of fifteen enthusiastic high school members at its core, Team Argo is committed to holding workshops and courses that open the fascinating world of robotics to everyone in our community. Through these initiatives, we strive to demystify technology, fostering an environment where curiosity leads to discovery and learning becomes a shared adventure. By nurturing skills, confidence, and a collaborative spirit, we aim not only to excel in robotics but to contribute positively to our world, making technology accessible and enjoyable for all. Our journey is about creating connections, sharing knowledge, and sparking a passion for innovation that will drive us toward a brighter, more inclusive future.</p2>
+    <hr>
     <h1>Meet The Team</h1>
 
-    <img
-      src="css/Images/Preston Potrait.jpg"
-      alt="Preston Tai"
-      title="Preston Tai - Project Manager"
-    />
+    <img src="css/Images/Preston Potrait.jpg" alt="Preston Tai" title="Preston Tai - Project Manager">
+
+
+
+
 
     <h2>Software Team</h2>
-
-    <div class="slideshow-container softwareTeam">
-      <!-- Slides for the Software Team -->
-      <!-- Slide 1 -->
-      <div class="my-slide fade">
-        <img src="css/Images/😍/IMG_20240103_143246.jpg" alt="Slide 2" />
-        <div class="text">Your text for Slide 2</div>
-      </div>
-      <!-- Slide 2-->
-      <div class="my-slide fade">
-        <img src="css/Images/😍/IMGP2941.jpg" alt="Slide 2" />
-        <div class="text">Your text for Slide 2</div>
-      </div>
-
-      <!-- Navigation buttons -->
-      <a class="prev" onclick="plusSlides(-1, 0)">&#10094;</a>
-      <a class="next" onclick="plusSlides(1, 0)">&#10095;</a>
+<div class="slideshow-container" id="slideshow1">
+    <div class="mySlides fade">
+        <img src="img1.jpg" style="width:100%">
+        <div class="text">Caption Text 1</div>
     </div>
+  <div class="mySlides fade">
+        <img src="img2.jpg" style="width:100%">
+        <div class="text">Caption Text 2</div>
+  </div>
+  <!-- Add as many slides as you want -->
+  <a class="prev" onclick="plusSlides(-1, 0)">&#10094;</a>
+  <a class="next" onclick="plusSlides(1, 0)">&#10095;</a>
+</div>
 
     <h2>Hardware Team</h2>
 
-    <div class="slideshow-container hardwareTeam">
-      <!-- Slides for the Software Team -->
-      <!-- Slide 1 -->
-      <div class="my-slide fade">
-        <img src="css/Images/😍/1000009672~3.jpg" alt="Slide 2" />
-        <div class="text">Your text for Slide 2</div>
-      </div>
-      <!-- Slide 2-->
-      <div class="my-slide fade">
-        <img src="css/Images/😍/1000009673~2.jpg" alt="Slide 2" />
-        <div class="text">Your text for Slide 2</div>
-      </div>
-
-      <!-- Navigation buttons -->
-      <a class="prev" onclick="plusSlides(-1, 0)">&#10094;</a>
-      <a class="next" onclick="plusSlides(1, 0)">&#10095;</a>
+<div class="slideshow-container" id="slideshow2">
+    <div class="mySlides fade">
+        <img src="img1.jpg" style="width:100%">
+        <div class="text">Caption Text 1</div>
     </div>
+  <div class="mySlides fade">
+        <img src="img2.jpg" style="width:100%">
+        <div class="text">Caption Text 2</div>
+  </div>
+  <!-- Add as many slides as you want -->    
+    <a class="prev" onclick="plusSlides(-1, 1)">&#10094;</a>
+    <a class="next" onclick="plusSlides(1, 1)">&#10095;</a>
+</div>
+
     <h2>Outreach Team</h2>
 
-    <div class="slideshow-container outreachTeam">
-      <!-- Slides for the Software Team -->
-      <!-- Slide 1 -->
-      <div class="my-slide fade">
-        <img src="css/Images/😍/IMGP4734.jpg" alt="Slide 2" />
-        <div class="text">Your text for Slide 2</div>
+    <div class="slideshow-container" id="slideshow2">
+        <div class="mySlides fade">
+            <img src="img1.jpg" style="width:100%">
+            <div class="text">Caption Text 1</div>
+        </div>
+      <div class="mySlides fade">
+            <img src="img2.jpg" style="width:100%">
+            <div class="text">Caption Text 2</div>
       </div>
-      <!-- Slide 2-->
-      <div class="my-slide fade">
-        <img src="css/Images/😍/IMGP5746.jpg" alt="Slide 2" />
-        <div class="text">Your text for Slide 2</div>
-      </div>
-
-      <!-- Navigation buttons -->
-      <a class="prev" onclick="plusSlides(-1, 2)">&#10094;</a>
-      <a class="next" onclick="plusSlides(1, 2)">&#10095;</a>
+      <!-- Add as many slides as you want -->    
+        <a class="prev" onclick="plusSlides(-1, 1)">&#10094;</a>
+        <a class="next" onclick="plusSlides(1, 1)">&#10095;</a>
     </div>
-    <script src="js/script.js"></script>
-  </body>
-</html>
+    </html>
