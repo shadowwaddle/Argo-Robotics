@@ -6,7 +6,7 @@ body {
   color: #7AB8F2;
   font-family: 'calibri', sans-serif;
   text-align: left;
-  margin: 80px adjustPadding();
+  margin: 80px adjustMargin();
   margin-bottom: 20px;
 }
 
