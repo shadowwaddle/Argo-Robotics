@@ -31,7 +31,7 @@ h3 {
 p {
     margin: 0;
     padding: 20px 0;
-    font-size: 20;
+    font-size: 25px;
 
 }
 
@@ -39,7 +39,7 @@ p2 {
     margin: 0;
     margin-bottom: 20px;
     padding: 20px 0;
-    font-size: 20;
+    font-size: 25px;
 }
 
 img {
@@ -117,7 +117,7 @@ textarea{
 }
 
 button{
-
+    font-family: 'calibri', sans-serif;
     margin-right: auto;
     margin-left: auto;
     height: 30px;
