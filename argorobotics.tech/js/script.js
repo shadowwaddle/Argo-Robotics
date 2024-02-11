@@ -1,3 +1,4 @@
+/*
 let slideIndex = [1, 1, 1]; // An array to hold the slide index for each carousel
 const carouselClasses = ["softwareTeam", "hardwareTeam", "outreachTeam"]; // Class names for each carousel
 
@@ -36,5 +37,35 @@ function showSlides(n, carouselNo) {
     else images[i].style.display = "none";
   }
 }
-
+*/
 // You may need to adjust the interval setup for each carousel if needed
+
+var slideIndex = [1, 1];
+var slideId = ["mySlides1", "mySlides2"]
+showSlides(1, 0);
+showSlides(1, 1);
+
+function plusSlides(n, no) {
+  showSlides(slideIndex[no] += n, no);
+}
+
+function showSlides(n, no) {
+  var i;
+  var x = document.getElementsByClassName(slideId[no]);
+  if (n > x.length) {slideIndex[no] = 1}    
+  if (n < 1) {slideIndex[no] = x.length}
+  for (i = 0; i < x.length; i++) {
+     x[i].style.display = "none";  
+  }
+  x[slideIndex[no]-1].style.display = "block";  
+}
+
+// Optional: Add auto-switching functionality
+function autoSwitch() {
+  for (var no = 0; no < slideId.length; no++) {
+    plusSlides(1, no);
+  }
+  setTimeout(autoSwitch, 4000); // Change image every 4 seconds
+}
+
+autoSwitch(); // Start the auto-switching function
