@@ -71,16 +71,20 @@ function autoSwitch() {
 
 autoSwitch(); // Start the auto-switching function
 
-window.addEventListener('resize', adjustPadding);
+window.addEventListener('resize', adjustMargin);
 
-function adjustPadding() {
+function adjustMargin() {
   const screenWidth = window.innerWidth;
-  const element = document.querySelector('.element');
+  const elements = document.querySelectorAll('.responsive-margin'); // Select elements with the class 'responsive-margin'
 
-  // Example calculation: inversely adjust padding based on screen width
-  const newPadding = Math.max(10, 1200 / screenWidth * 10);
-  element.style.padding = `${newPadding}px`;
+  elements.forEach(element => {
+    // Example calculation: inversely adjust margin based on screen width
+    // You can adjust the formula as needed for your design
+    const newMargin = Math.max(10, 1200 / screenWidth * 10);
+    element.style.margin = `${newMargin}px`;
+  });
 }
 
-// Initial adjustment
-adjustPadding();
+// Initial adjustment and adjust on page load
+adjustMargin();
+document.addEventListener('DOMContentLoaded', adjustMargin);
