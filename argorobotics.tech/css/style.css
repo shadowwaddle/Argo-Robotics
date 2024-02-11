@@ -120,7 +120,25 @@ button{
     font-family: 'calibri', sans-serif;
     margin-right: auto;
     margin-left: auto;
-    height: 25px;
-    width: 150px;
-    font-size: 15px;
+    height: 30px;
+    width: 175px;
+    font-size: 20px;
 }
+
+#back-to-top-btn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+  }
+  
+  #back-to-top-btn:hover {
+    background-color: #0056b3;
+  }
+  
