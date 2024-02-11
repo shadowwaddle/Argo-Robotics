@@ -70,3 +70,17 @@ function autoSwitch() {
 }
 
 autoSwitch(); // Start the auto-switching function
+
+window.addEventListener('resize', adjustPadding);
+
+function adjustPadding() {
+  const screenWidth = window.innerWidth;
+  const element = document.querySelector('.element');
+
+  // Example calculation: inversely adjust padding based on screen width
+  const newPadding = Math.max(10, 1200 / screenWidth * 10);
+  element.style.padding = `${newPadding}px`;
+}
+
+// Initial adjustment
+adjustPadding();
