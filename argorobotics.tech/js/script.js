@@ -21,6 +21,7 @@ function showSlides(n, slideshowId) {
 setInterval(() => {
     plusSlides(1, 'slideshow-1');
     plusSlides(1, 'slideshow-2');
+    plusSlides(1, 'slideshow-3')
     // Add more slideshow instances as needed
 }, 5000); // Change slide every 5 seconds (adjust as needed)
   
