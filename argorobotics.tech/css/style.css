@@ -28,6 +28,17 @@ h3 {
   font-size: 30px;
 }
 
+h4 {
+    color: #f2f2f2;
+    font-size: 15px;
+    padding: 8px 12px;
+    position: center;
+    bottom: 8px;
+    width: 100%;
+    text-align: center;
+    margin-top: -4px;
+}
+
 p {
   margin: 0;
   padding: 20px 0;
@@ -128,7 +139,9 @@ button{
   top: 50%;
   width: auto;
   margin-top: -22px;
-  padding: 16px;
+  padding: 8px;
+  padding-left: 200px;
+  padding-right: 200px;
   color: white;
   font-weight: bold;
   font-size: 18px;
@@ -145,15 +158,15 @@ button{
   
 /* Caption text */
 .text {
+  font-family: 'calibri', sans-serif;
   color: #f2f2f2;
   font-size: 15px;
   padding: 8px 12px;
   position: absolute;
-  bottom: 8px;
+  bottom: -30px;
   width: 100%;
   text-align: center;
-}
-  
+}  
 /* Fading animation */
 .fade {
   animation-name: fade;
