@@ -112,9 +112,7 @@ button{
 
 /* Style the slideshow container */ 
 .slideshow-container {
-  position: relative;
   margin: auto;
-  height: auto;
 }
   
 /* Hide the images by default */
