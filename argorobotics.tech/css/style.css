@@ -118,7 +118,7 @@ textarea{
 
 button{
     margin-right: auto;
-    margin-left: auto;
+    margin-left: auto+20;
     height: 50px;
     width: 230px;
     font-size: 30px;
