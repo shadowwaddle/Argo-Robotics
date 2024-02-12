@@ -64,10 +64,10 @@ showSlides(1, 3);
 
 // Optional: Add auto-switching functionality
 function autoSwitch() {
-  for (var no = 0; no < slideId.length; no++) {
+  for (var no = 0; no < slideIndex.length; no++) {
     plusSlides(1, no);
   }
-  setTimeout(autoSwitch, 4000); // Change image every 4 seconds
+  setTimeout(autoSwitch, 3000); // Change image every 3 seconds
 }
 
 autoSwitch(); // Start the auto-switching function
