@@ -101,7 +101,7 @@ button{
 /* PHONES */
 @media only screen and (max-width: 600px) {
   body {
-    margin: 10px;
+    margin: 0px;
     font-size: 14px;
   }
   h1 {
@@ -147,8 +147,8 @@ button{
   width: auto;
   margin-top: -10px;
   padding: 8px;
-  padding-left: 200px;
-  padding-right: 200px;
+  padding-left: 0x;
+  padding-right: 0px;
   color: white;
   font-weight: bold;
   font-size: 18px;
@@ -223,8 +223,8 @@ button{
   width: auto;
   margin-top: -15px;
   padding: 8px;
-  padding-left: 200px;
-  padding-right: 200px;
+  padding-left: 50px;
+  padding-right: 50px;
   color: white;
   font-weight: bold;
   font-size: 18px;
