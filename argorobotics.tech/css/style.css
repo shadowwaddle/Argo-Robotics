@@ -74,6 +74,7 @@ button{
 }
 
 /* Fading animation */
+/*
 .fade {
   animation-name: fade;
   animation-duration: 1.5s;
@@ -82,7 +83,7 @@ button{
   from {opacity: .4} 
   to {opacity: 1}
 }
-
+*/
 /* Style the slideshow container */ 
 .slideshow-container {
   position: relative;
