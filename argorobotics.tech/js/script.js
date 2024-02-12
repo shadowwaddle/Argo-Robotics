@@ -1,44 +1,3 @@
-/*
-let slideIndex = [1, 1, 1]; // An array to hold the slide index for each carousel
-const carouselClasses = ["softwareTeam", "hardwareTeam", "outreachTeam"]; // Class names for each carousel
-
-// Initialize all carousels
-carouselClasses.forEach((className, i) => showSlides(slideIndex[i], i));
-
-function plusSlides(n, carouselNo) {
-  slideIndex[carouselNo] += n;
-  showSlides(slideIndex[carouselNo], carouselNo);
-}
-
-// function showSlides(n, carouselNo) {
-//   let i;
-//   let slides = document.getElementsByClassName(carouselClasses[carouselNo]);
-//   console.log("SLIDE INDEX", slideIndex, "SLIDES", slides);
-//   if (n > slides.length) {
-//     slideIndex[carouselNo] = 1;
-//   }
-//   if (n < 1) {
-//     slideIndex[carouselNo] = slides.length;
-//   }
-//   for (i = 0; i < slides.length; i++) {
-//     slides[i].style.display = "none";
-//   }
-//   slides[slideIndex[carouselNo] - 1].style.display = "block";
-// }
-
-function showSlides(n, carouselNo) {
-  console.log("n:", n, "carousel #", carouselNo); // This is just for testing (LOOK AT THIS)
-  let slides = document.getElementsByClassName(carouselClasses[carouselNo])[0]; // Get HTML carousel element by className getElementsByClassName returns an array, so you need to get the first element of the array
-  let images = slides.getElementsByClassName("my-slide"); // slides references the parent <div> object of the images. But you want the images, so you get the images
-
-  // Go through all the images and set the styling
-  for (let i = 0; i < images.length; i++) {
-    if (i == n) images[i].style.display = "block";
-    else images[i].style.display = "none";
-  }
-}
-*/
-// You may need to adjust the interval setup for each carousel if needed
 
 var slideIndex = [1, 1, 1]; // Adjusted for three slideshows
 
@@ -60,24 +19,16 @@ function showSlides(n, no) {
 showSlides(1, 0);
 showSlides(1, 1);
 showSlides(1, 2); // Added initialization for the third slideshow
-<<<<<<< HEAD
 showSlides(1, 3);
 showSlides(1, 4);
 showSlides(1, 5); // Added initialization for fifth slideshow
-=======
->>>>>>> c10706ae0b7b644742dde0ee6d1d725a95e7f999
 
 // Optional: Add auto-switching functionality
 function autoSwitch() {
   for (var no = 0; no < slideIndex.length; no++) {
     plusSlides(1, no);
   }
-<<<<<<< HEAD
-  setTimeout(autoSwitch, 5000); // Change image every 4 seconds
-=======
-  console.log("Switching sides");
-  setTimeout(autoSwitch, 3000); // Change image every 3 seconds
->>>>>>> c10706ae0b7b644742dde0ee6d1d725a95e7f999
+  setTimeout(autoSwitch, 1000); // Change image every 4 seconds
 }
 
 autoSwitch(); // Start the auto-switching function
