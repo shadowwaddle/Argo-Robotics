@@ -6,7 +6,7 @@ body {
   color: #7AB8F2;
   font-family: 'calibri', sans-serif;
   text-align: left;
-  margin: 80px 100px;
+  margin: 20px 10px;
   margin-bottom: 20px;
 }
 
@@ -155,7 +155,6 @@ button{
   right: 0;
   border-radius: 3px 0 0 3px;
 }
-  
 /* Caption text */
 .text {
   font-family: 'calibri', sans-serif;
@@ -178,3 +177,11 @@ button{
   to {opacity: 1}
 }
   
+
+
+/* styling for computers */
+@media only screen and (min-width: 1201px) {
+  body {
+    margin: 200px 400px;
+}
+}
