@@ -68,5 +68,3 @@ function autoSwitch() {
   }
   setTimeout(autoSwitch, 3000); // Change image every 3 seconds
 }
-
-autoSwitch(); // Start the auto-switching function
