@@ -180,7 +180,7 @@ button{
 
 
 /* styling for computers */
-@media only screen and (min-width: 1201px) {
+@media only screen and (min-width: 1080px) {
   body {
     margin: 200px 400px;
 }
