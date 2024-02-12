@@ -60,7 +60,6 @@ function showSlides(n, no) {
 showSlides(1, 0);
 showSlides(1, 1);
 showSlides(1, 2); // Added initialization for the third slideshow
-showSlides(1, 3);
 
 // Optional: Add auto-switching functionality
 function autoSwitch() {
