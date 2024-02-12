@@ -25,6 +25,7 @@ img {
   position: fixed; /* Keeps the header at the top of the page */
   top: 0; /* Aligns the header at the top edge of the viewport */
   left: 0; /* Aligns the header at the left edge of the viewport */
+  height: 10%;
   width: 100%; /* Ensures the header extends across the full width */
   background-color: #000000; /* Header background color */
   box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: Adds a shadow for better separation */
