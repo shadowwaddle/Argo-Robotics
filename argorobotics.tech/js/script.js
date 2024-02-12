@@ -28,7 +28,7 @@ function autoSwitch() {
   for (var no = 0; no < slideIndex.length; no++) {
     plusSlides(1, no);
   }
-  setTimeout(autoSwitch, 10000); // Change image every 4 seconds
+  setTimeout(autoSwitch, 15000); // Change image every 4 seconds
 }
 
 autoSwitch(); // Start the auto-switching function
