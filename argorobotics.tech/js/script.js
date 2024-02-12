@@ -66,6 +66,7 @@ function autoSwitch() {
   for (var no = 0; no < slideIndex.length; no++) {
     plusSlides(1, no);
   }
+  console.log("Switching sides");
   setTimeout(autoSwitch, 3000); // Change image every 3 seconds
 }
 
