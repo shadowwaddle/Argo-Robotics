@@ -19,16 +19,14 @@ function showSlides(n, no) {
 showSlides(1, 0);
 showSlides(1, 1);
 showSlides(1, 2); // Added initialization for the third slideshow
-showSlides(1, 3);
-showSlides(1, 4);
-showSlides(1, 5); // Added initialization for fifth slideshow
 
 // Optional: Add auto-switching functionality
 function autoSwitch() {
   for (var no = 0; no < slideIndex.length; no++) {
     plusSlides(1, no);
   }
-  setTimeout(autoSwitch, 15000); // Change image every 4 seconds
+  console.log("Switching sides");
+  setTimeout(autoSwitch, 7000); // Change image every 3 seconds
 }
 
 autoSwitch(); // Start the auto-switching function
