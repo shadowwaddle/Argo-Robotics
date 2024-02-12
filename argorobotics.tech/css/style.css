@@ -66,12 +66,10 @@ textarea{
 
 button{
   font-family: 'calibri', sans-serif;
-  background-color: #003366;
-  color: #7AB8F2;
   margin-right: auto;
   margin-left: auto;
   height: 30px;
-  width: 100px;
+  width: 175px;
   font-size: 20px;
 }
 
