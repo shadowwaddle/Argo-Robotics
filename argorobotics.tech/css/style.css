@@ -21,20 +21,6 @@ img {
   width: auto;
   height: auto;
 }
-/* heading */
-.fixed-header {
-  position: fixed; /* Keeps the header at the top of the page */
-  top: 0; /* Aligns the header at the top edge of the viewport */
-  left: 0; /* Aligns the header at the left edge of the viewport */
-  height: 10%;
-  width: 100%; /* Ensures the header extends across the full width */
-  background-color: #000000; /* Header background color */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: Adds a shadow for better separation */
-  z-index: 1000; /* Ensures the header is above other content */
-  display: flex; /* Aligns logo and heading in a row */
-  align-items: center; /* Centers items vertically */
-  padding: 10px 20px; /* Adds some padding inside the header */
-}
 
 .logo {
   height: 75px; /* Adjust based on your logo's size */
@@ -65,15 +51,7 @@ textarea{
     outline: none;
 }
 
-button{
-  background-color: #003366;
-  color: #7AB8F2;
-  font-family: 'calibri', sans-serif;
-  margin: auto;
-  height: 30px;
-  width: 150px;
-  font-size: 20px;
-}
+
 
 /* Fading animation */
 /*
@@ -177,6 +155,32 @@ button{
   width: 100%;
   text-align: center;
 } 
+
+/* heading */
+.fixed-header {
+  position: fixed; /* Keeps the header at the top of the page */
+  top: 0; /* Aligns the header at the top edge of the viewport */
+  left: 0; /* Aligns the header at the left edge of the viewport */
+  height: 10%;
+  width: 100%; /* Ensures the header extends across the full width */
+  background-color: #000000; /* Header background color */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: Adds a shadow for better separation */
+  z-index: 1000; /* Ensures the header is above other content */
+  display: flex; /* Aligns logo and heading in a row */
+  align-items: center; /* Centers items vertically */
+  padding: 10px 20px; /* Adds some padding inside the header */
+}
+
+button{
+  background-color: #003366;
+  color: #7AB8F2;
+  font-family: 'calibri', sans-serif;
+  margin: auto;
+  height: 30px;
+  width: 75px;
+  font-size: 15px;
+}
+
 }
 
 
@@ -253,6 +257,32 @@ button{
   width: 100%;
   text-align: center;
 } 
+
+/* heading */
+.fixed-header {
+  position: fixed; /* Keeps the header at the top of the page */
+  top: 0; /* Aligns the header at the top edge of the viewport */
+  left: 0; /* Aligns the header at the left edge of the viewport */
+  height: 10%;
+  width: 100%; /* Ensures the header extends across the full width */
+  background-color: #000000; /* Header background color */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: Adds a shadow for better separation */
+  z-index: 1000; /* Ensures the header is above other content */
+  display: flex; /* Aligns logo and heading in a row */
+  align-items: center; /* Centers items vertically */
+  padding: 10px 20px; /* Adds some padding inside the header */
+}
+
+button{
+  background-color: #003366;
+  color: #7AB8F2;
+  font-family: 'calibri', sans-serif;
+  margin: auto;
+  height: 30px;
+  width: 150px;
+  font-size: 20px;
+}
+
 }
 
 
@@ -312,6 +342,32 @@ button{
   width: 100%;
   text-align: center;
 } 
+
+/* heading */
+.fixed-header {
+  position: fixed; /* Keeps the header at the top of the page */
+  top: 0; /* Aligns the header at the top edge of the viewport */
+  left: 0; /* Aligns the header at the left edge of the viewport */
+  height: 75px;
+  width: 100%; /* Ensures the header extends across the full width */
+  background-color: #000000; /* Header background color */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: Adds a shadow for better separation */
+  z-index: 1000; /* Ensures the header is above other content */
+  display: flex; /* Aligns logo and heading in a row */
+  align-items: center; /* Centers items vertically */
+  padding: 10px 20px; /* Adds some padding inside the header */
+}
+
+button{
+  align-self: center;
+  background-color: #003366;
+  color: #7AB8F2;
+  font-family: 'calibri', sans-serif;
+  margin: auto;
+  height: 30px;
+  width: 150px;
+  font-size: 20px;
+}
 
 }
 
