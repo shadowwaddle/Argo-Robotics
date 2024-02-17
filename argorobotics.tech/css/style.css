@@ -171,7 +171,9 @@ textarea{
   z-index: 1000; /* Ensures the header is above other content */
   display: flex; /* Aligns logo and heading in a row */
   align-items: center; /* Centers items vertically */
-  padding: 10px 20px; /* Adds some padding inside the header */
+  padding: 10px 2%; /* Adds some padding inside the header */
+  justify-content: space-evenly;
+  display: flex;
 }
 
 button{
@@ -276,7 +278,9 @@ button{
   z-index: 1000; /* Ensures the header is above other content */
   display: flex; /* Aligns logo and heading in a row */
   align-items: center; /* Centers items vertically */
-  padding: 10px 20px; /* Adds some padding inside the header */
+  padding: 10px 4%; /* Adds some padding inside the header */
+  justify-content: space-evenly;
+  display: flex;
 }
 
 button{
@@ -352,7 +356,7 @@ button{
 } 
 
 /* heading */
-.fixed-header {
+header {
   position: fixed; /* Keeps the header at the top of the page */
   top: 0; /* Aligns the header at the top edge of the viewport */
   left: 0; /* Aligns the header at the left edge of the viewport */
@@ -363,7 +367,7 @@ button{
   z-index: 1000; /* Ensures the header is above other content */
   display: flex; /* Aligns logo and heading in a row */
   align-items: center; /* Centers items vertically */
-  padding: 10px 20px; /* Adds some padding inside the header */
+  padding: 10px 5%; /* Adds some padding inside the header */
   justify-content: space-evenly;
   display: flex;
 }
@@ -377,6 +381,11 @@ button{
   height: 30px;
   width: 150px;
   font-size: 20px;
+}
+
+.button-container{
+    display: flex;
+    justify-content: space-evenly;
 }
 
 }
