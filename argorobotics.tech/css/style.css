@@ -83,10 +83,7 @@ textarea{
 /* PHONES */
 @media only screen and (max-width: 600px) {
   body {
-    margin-left: 5%;
-    margin-right: 5%;
-    margin-top: 95px;
-    margin-bottom: 20px;
+    margin: 100px 0px;
     font-size: 14px;
   }
   h1 {
@@ -103,7 +100,8 @@ textarea{
   }
   h4, .text {
     font-size: 12px;
-    padding: 4px 6px;
+    color: white;
+    text-align: center;
   }
   p, p2 {
     font-size: 18px;
@@ -171,9 +169,7 @@ textarea{
   z-index: 1000; /* Ensures the header is above other content */
   display: flex; /* Aligns logo and heading in a row */
   align-items: center; /* Centers items vertically */
-  padding: 10px 2%; /* Adds some padding inside the header */
-  justify-content: space-evenly;
-  display: flex;
+  padding: 10px 20px; /* Adds some padding inside the header */
 }
 
 button{
@@ -192,10 +188,7 @@ button{
 /* TABLETS */
 @media only screen and (min-width: 600px) and (max-width: 900px) {
   body {
-    margin-left: 10%;
-    margin-right: 10%;
-    margin-top: 90px;
-    margin-bottom: 20px;
+    margin: 100px 100px;
     font-size: 16px;
   }
   h1 {
@@ -278,9 +271,7 @@ button{
   z-index: 1000; /* Ensures the header is above other content */
   display: flex; /* Aligns logo and heading in a row */
   align-items: center; /* Centers items vertically */
-  padding: 10px 4%; /* Adds some padding inside the header */
-  justify-content: space-evenly;
-  display: flex;
+  padding: 10px 20px; /* Adds some padding inside the header */
 }
 
 button{
@@ -299,11 +290,9 @@ button{
 /* COMPUTERS */
 @media only screen and (min-width: 901px) {
   body {
-    margin-left: 20%;
-    margin-right: 20%;
-    margin-top: 90px;
+    margin: 100px 400px;
     margin-bottom: 20px;
-    font-size: 20px;
+    font-size: 25px;
   }
   h1 {
     font-size: 100px; /* Adjust if needed */
@@ -356,7 +345,7 @@ button{
 } 
 
 /* heading */
-header {
+.fixed-header {
   position: fixed; /* Keeps the header at the top of the page */
   top: 0; /* Aligns the header at the top edge of the viewport */
   left: 0; /* Aligns the header at the left edge of the viewport */
@@ -367,9 +356,7 @@ header {
   z-index: 1000; /* Ensures the header is above other content */
   display: flex; /* Aligns logo and heading in a row */
   align-items: center; /* Centers items vertically */
-  padding: 10px 5%; /* Adds some padding inside the header */
-  justify-content: space-evenly;
-  display: flex;
+  padding: 10px 20px; /* Adds some padding inside the header */
 }
 
 button{
@@ -381,11 +368,6 @@ button{
   height: 30px;
   width: 150px;
   font-size: 20px;
-}
-
-.button-container{
-    display: flex;
-    justify-content: space-evenly;
 }
 
 }
