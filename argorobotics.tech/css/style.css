@@ -18,8 +18,9 @@ img {
   border-image: auto;
   margin: auto;
   display: block;
-  width: auto;
-  height: auto;
+  width: 400px;
+  height: 400px;
+  object-fit: cover;
 }
 
 .logo {
