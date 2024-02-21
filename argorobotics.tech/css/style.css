@@ -64,19 +64,6 @@ textarea{
     outline: none;
 }
 
-
-
-/* Fading animation */
-/*
-.fade {
-  animation-name: fade;
-  animation-duration: 1.5s;
-}
-@keyframes fade {
-  from {opacity: .4} 
-  to {opacity: 1}
-}
-*/
 /* Style the slideshow container */ 
 .slideshow-container {
   position: relative;
@@ -296,8 +283,8 @@ button{
   font-family: 'calibri', sans-serif;
   margin: auto;
   height: 30px;
-  width: 150px;
-  font-size: 20px;
+  width: 110px;
+  font-size: 15px;
 }
 
 }
