@@ -80,7 +80,7 @@ textarea{
 /* Style the slideshow container */ 
 .slideshow-container {
   position: relative;
-    margin: auto;
+  margin: auto;
 }
   
 /* Hide the images by default */
@@ -88,9 +88,12 @@ textarea{
     display: none;
 }
 
-
-
-
+.button-container {
+  display: flex;
+  gap: auto; /* Adjust the spacing between buttons */
+  margin-left: auto;
+  margin-right: auto;
+}
 
 
 /* PHONES */
