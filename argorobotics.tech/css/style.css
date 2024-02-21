@@ -86,8 +86,11 @@ textarea{
 /* PHONES */
 @media only screen and (max-width: 600px) {
   body {
-    margin: 100px 0px;
+    margin-top: 70px;
+    margin-bottom: 20px;
     font-size: 14px;
+    margin-left: 5%;
+    margin-right: 5%;
   }
   h1 {
     font-size: 50px;
@@ -165,7 +168,7 @@ textarea{
   position: fixed; /* Keeps the header at the top of the page */
   top: 0; /* Aligns the header at the top edge of the viewport */
   left: 0; /* Aligns the header at the left edge of the viewport */
-  height: 10%;
+  height: 50px;
   width: 100%; /* Ensures the header extends across the full width */
   background-color: #000000; /* Header background color */
   box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: Adds a shadow for better separation */
@@ -181,8 +184,8 @@ button{
   font-family: 'calibri', sans-serif;
   margin: auto;
   height: 30px;
-  width: 75px;
-  font-size: 15px;
+  width: 70px;
+  font-size: 12px;
 }
 
 }
@@ -191,7 +194,10 @@ button{
 /* TABLETS */
 @media only screen and (min-width: 600px) and (max-width: 900px) {
   body {
-    margin: 100px 100px;
+    margin-top: 70px;
+    margin-bottom: 20px;
+    margin-left: 15%;
+    margin-right: 15%;
     font-size: 16px;
   }
   h1 {
@@ -235,8 +241,8 @@ button{
   width: auto;
   margin-top: -15px;
   padding: 8px;
-  padding-left: 50px;
-  padding-right: 50px;
+  padding-left: 7%;
+  padding-right: 7%;
   color: white;
   font-weight: bold;
   font-size: 18px;
@@ -267,7 +273,7 @@ button{
   position: fixed; /* Keeps the header at the top of the page */
   top: 0; /* Aligns the header at the top edge of the viewport */
   left: 0; /* Aligns the header at the left edge of the viewport */
-  height: 10%;
+  height: 50px;
   width: 100%; /* Ensures the header extends across the full width */
   background-color: #000000; /* Header background color */
   box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: Adds a shadow for better separation */
@@ -283,7 +289,7 @@ button{
   font-family: 'calibri', sans-serif;
   margin: auto;
   height: 30px;
-  width: 110px;
+  width: 90px;
   font-size: 15px;
 }
 
@@ -293,8 +299,10 @@ button{
 /* COMPUTERS */
 @media only screen and (min-width: 901px) {
   body {
-    margin: 100px 400px;
+    margin-top: 85px;
     margin-bottom: 20px;
+    margin-left: 20%;
+    margin-right: 20%;
     font-size: 25px;
   }
   h1 {
@@ -320,8 +328,8 @@ button{
   width: auto;
   margin-top: -22px;
   padding: 8px;
-  padding-left: 130px;
-  padding-right: 130px;
+  padding-left: 10%;
+  padding-right: 10%;
   color: white;
   font-weight: bold;
   font-size: 18px;
@@ -352,7 +360,7 @@ button{
   position: fixed; /* Keeps the header at the top of the page */
   top: 0; /* Aligns the header at the top edge of the viewport */
   left: 0; /* Aligns the header at the left edge of the viewport */
-  height: 75px;
+  height: 60px;
   width: 100%; /* Ensures the header extends across the full width */
   background-color: #000000; /* Header background color */
   box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: Adds a shadow for better separation */
