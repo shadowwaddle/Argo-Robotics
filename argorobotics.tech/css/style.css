@@ -78,10 +78,22 @@ textarea{
 .button-container {
   display: flex;
   gap: auto; /* Adjust the spacing between buttons */
+  justify-content: space-around;
   margin-left: auto;
   margin-right: auto;
 }
 
+.email {
+  background-color: #3498db;
+}
+
+.instagram {
+  background-color: #e4405f;
+}
+
+.linkedin {
+  background-color: #0077b5;
+}
 
 /* PHONES */
 @media only screen and (max-width: 600px) {
@@ -381,18 +393,5 @@ button{
   font-size: 20px;
 }
 
+
 }
-
-
-.mail-container {
-  background-color: #000000;
-  padding: 10px;
-}
-
-
-
-
-
-  
- 
-  
