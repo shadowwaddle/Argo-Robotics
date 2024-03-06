@@ -75,24 +75,15 @@ textarea{
     display: none;
 }
 
-.button-container {
+.button-icon {
+  height: 100px;
+  width: auto;
   display: flex;
-  gap: auto; /* Adjust the spacing between buttons */
-  justify-content: space-around;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.email {
-  background-color: #3498db;
-}
-
-.instagram {
-  background-color: #e4405f;
-}
-
-.linkedin {
-  background-color: #0077b5;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: #003366; /* Adjust text color as needed */
 }
 
 /* PHONES */
@@ -190,6 +181,14 @@ textarea{
   padding: 10px 20px; /* Adds some padding inside the header */
 }
 
+.button-container {
+  display: flex;
+  gap: auto; /* Adjust the spacing between buttons */
+  justify-content: space-around;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 button{
   background-color: #003366;
   color: #7AB8F2;
@@ -198,6 +197,8 @@ button{
   height: 30px;
   width: 70px;
   font-size: 12px;
+  border-radius: 20px;
+
 }
 
 }
@@ -295,6 +296,14 @@ button{
   padding: 10px 20px; /* Adds some padding inside the header */
 }
 
+.button-container {
+  display: flex;
+  gap: auto; /* Adjust the spacing between buttons */
+  justify-content: space-around;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 button{
   background-color: #003366;
   color: #7AB8F2;
@@ -303,6 +312,8 @@ button{
   height: 30px;
   width: 90px;
   font-size: 15px;
+  border-radius: 20px;
+
 }
 
 }
@@ -382,6 +393,14 @@ button{
   padding: 10px 20px; /* Adds some padding inside the header */
 }
 
+.button-container {
+  display: flex;
+  gap: 20px; /* Adjust the spacing between buttons */
+  justify-content: space-around;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 button{
   align-self: center;
   background-color: #003366;
@@ -391,7 +410,9 @@ button{
   height: 30px;
   width: 150px;
   font-size: 20px;
+  border-radius: 20px;
 }
+
 
 
 }
