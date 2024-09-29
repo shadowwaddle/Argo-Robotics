@@ -22,6 +22,7 @@ public class TempArmMovement extends LinearOpMode {
         armMotor  = hardwareMap.get(DcMotor.class, "armMotor");
 
         //While OpMode is active, checks each button to determine movement direction
+        //Holding down the button moves it in each direction.
         while (opModeIsActive()) {
 
             if (gamepad2.a) {
