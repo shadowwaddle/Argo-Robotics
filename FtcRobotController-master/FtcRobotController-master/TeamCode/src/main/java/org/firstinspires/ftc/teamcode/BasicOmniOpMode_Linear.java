@@ -128,7 +128,7 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             max = Math.max(max, Math.abs(leftBackPower));
             max = Math.max(max, Math.abs(rightBackPower));
 
-            if (max > 0.2) {
+            if (max > 0.1) {
                 leftFrontPower  /= max;
                 rightFrontPower /= max;
                 leftBackPower   /= max;
