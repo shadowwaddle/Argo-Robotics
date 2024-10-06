@@ -7,41 +7,41 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 //Temporary OpMode to test the arm angle motion. Will be moved into the main opmode after testing.
+//Currently has code for linear side disabled. Make sure to uncomment those lines
+//once the slide is mounted.
 @TeleOp(name  = "Arm Movement Testing",
         group = "Linear OpMode")
 public class TempArmMovement extends LinearOpMode
 {
 
-    //Declaring time counter variable, Arm motor object
+    //Declaring time counter variable, motor objects
     private ElapsedTime runTime = new ElapsedTime();
     private DcMotor armMotor    = null;
+    //private DcMotor slideMotor  = null;
 
     @Override
     public void runOpMode()
     {
-        //Mapping the motor
-        armMotor  = hardwareMap.get(DcMotor.class, "armMotor");
+        //Mapping the motors and creating input variable.
+        armMotor   = hardwareMap.get(DcMotor.class, "armMotor");
+        //slideMotor = hardwareMap.get(DcMotor.class, "slideMotor");
 
         //While OpMode is active, checks each button to determine movement direction
         //Holding down the button moves it in each direction.
+
+        waitForStart();
+
         while (opModeIsActive())
         {
-            if (gamepad2.a)
-            {
-                armMotor.setPower(0.1);
-            }
-            else if (gamepad2.b)
-            {
-                armMotor.setPower(-0.1);
-            }
-            else
-            {
-                armMotor.setPower(0);
-            }
 
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            //Input variable creation
+            double armInput = -gamepad2.left_stick_y;
 
+            //Setting power
+            armMotor.setPower(armInput / 5.0);
+            //slideMotor.setPower(armInput / 5.0);
+
+            telemetry.addData("Status", "Run Time: " + runTime.toString());
         }
-
     }
 }
