@@ -38,8 +38,8 @@ public class TempArmMovement extends LinearOpMode
             double armInput = -gamepad2.left_stick_y;
 
             //Setting power
-            armMotor.setPower(armInput / 5.0);
-            //slideMotor.setPower(armInput / 5.0);
+            armMotor.setPower(armInput);
+            //slideMotor.setPower(armInput);
 
             telemetry.addData("Status", "Run Time: " + runTime.toString());
         }
