@@ -10,7 +10,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 //Runs without controller.
 @TeleOp(name  = "Basic: No Controller Movement Test",
         group = "Linear OpMode")
-public class NoControllerMoveTest extends LinearOpMode {
+public class NoControllerMoveTest extends LinearOpMode
+{
 
     private ElapsedTime runtime     = new ElapsedTime();
     private DcMotor leftFrontDrive  = null;
@@ -20,7 +21,8 @@ public class NoControllerMoveTest extends LinearOpMode {
 
 
     @Override
-    public void runOpMode() {
+    public void runOpMode()
+    {
 
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "leftFrontDrive");
         leftBackDrive   = hardwareMap.get(DcMotor.class, "leftBackDrive");
@@ -40,7 +42,8 @@ public class NoControllerMoveTest extends LinearOpMode {
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
+        while (opModeIsActive())
+        {
             // Send calculated power to wheels
             leftFrontDrive.setPower(0.1);
             rightFrontDrive.setPower(0.1);

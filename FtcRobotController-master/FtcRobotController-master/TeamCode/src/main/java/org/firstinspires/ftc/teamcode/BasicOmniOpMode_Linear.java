@@ -65,8 +65,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name  = "Basic: Omni Linear OpMode",
         group = "Linear OpMode")
-public class BasicOmniOpMode_Linear extends LinearOpMode {
-
+public class BasicOmniOpMode_Linear extends LinearOpMode
+{
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime     = new ElapsedTime();
     private DcMotor leftFrontDrive  = null;
@@ -75,7 +75,8 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
     private DcMotor rightBackDrive  = null;
 
     @Override
-    public void runOpMode() {
+    public void runOpMode()
+    {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
@@ -107,7 +108,8 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
+        while (opModeIsActive())
+        {
             double max;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
@@ -128,7 +130,8 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             max = Math.max(max, Math.abs(leftBackPower));
             max = Math.max(max, Math.abs(rightBackPower));
 
-            if (max > 0.1) {
+            if (max > 0.1)
+            {
                 leftFrontPower  /= max;
                 rightFrontPower /= max;
                 leftBackPower   /= max;
@@ -164,4 +167,5 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.update();
         }
-    }}
+    }
+}
