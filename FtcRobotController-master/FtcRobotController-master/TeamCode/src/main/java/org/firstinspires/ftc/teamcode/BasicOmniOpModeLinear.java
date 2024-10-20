@@ -41,38 +41,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 import java.util.Locale;
 
-/*
- * This file contains an example of a Linear "OpMode".
- * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
- * The names of OpModes appear on the menu of the FTC Driver Station.
- * When a selection is made from the menu, the corresponding OpMode is executed.
- *
- * This particular OpMode illustrates driving a 4-motor Omni-Directional (or Holonomic) robot.
- * This code will work with either a Mecanum-Drive or an X-Drive train.
- * Both of these drives are illustrated at https://gm0.org/en/latest/docs/robot-design/drivetrains/holonomic.html
- * Note that a Mecanum drive must display an X roller-pattern when viewed from above.
- *
- * Also note that it is critical to set the correct rotation direction for each motor.  See details below.
- *
- * Holonomic drives provide the ability for the robot to move in three axes (directions) simultaneously.
- * Each motion axis is controlled by one Joystick axis.
- *
- * 1) Axial:    Driving forward and backward               Left-joystick Forward/Backward
- * 2) Lateral:  Strafing right and left                     Left-joystick Right and Left
- * 3) Yaw:      Rotating Clockwise and counter clockwise    Right-joystick Right and Left
- *
- * This code is written assuming that the right-side motors need to be reversed for the robot to drive forward.
- * When you first test your robot, if it moves backward when you push the left stick forward, then you must flip
- * the direction of all 4 motors (see code below).
- *
- * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
- */
-
 @TeleOp(name  = "Basic: Omni Linear OpMode",
         group = "Linear OpMode"
         )
-public class BasicOmniOpMode_Linear extends LinearOpMode
+public class BasicOmniOpModeLinear extends LinearOpMode
 {
     // Declare OpMode members for each of the 4 motors.
     // The motors correspond to ports 3, 1, 2, 0 respectively.
@@ -82,19 +54,23 @@ public class BasicOmniOpMode_Linear extends LinearOpMode
     private DcMotor leftBackDrive   = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive  = null;
+    private DcMotor linearActuator  = null;
+    private DcMotor armMotor        = null;
+    private DcMotor viperMotor      = null;
+
 
     // Declaring variables for the built-in encoders for each motor.
     // We will be using the pod for getting data, going to need more reading to see
     // if these are even necessary. We might just be directly using goToPosition without a var.
-    private int leftFrontPosition   = null;
-    private int leftBackPosition    = null;
-    private int rightFrontPosition  = null;
-    private int rightBackPosition   = null;
+    //private int leftFrontPosition   = null;
+    //private int leftBackPosition    = null;
+    //private int rightFrontPosition  = null;
+    //private int rightBackPosition   = null;
 
     // Variables for the odometry calculator.
     // oldTime will be used in frequency calculation.
-    private GoBildaPinpointDriver odometryCalc;
-    private double oldTime = 0.0;
+    //private GoBildaPinpointDriver odometryCalc;
+    //private double oldTime = 0.0;
     @Override
     public void runOpMode()
     {
@@ -105,7 +81,11 @@ public class BasicOmniOpMode_Linear extends LinearOpMode
         leftBackDrive   = hardwareMap.get(DcMotor.class, "leftBackDrive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFrontDrive");
         rightBackDrive  = hardwareMap.get(DcMotor.class, "rightBackDrive");
-        odometryCalc    = hardwareMap.get(GoBildaPinpointDriver.class, "odometryCalc");
+        //odometryCalc    = hardwareMap.get(GoBildaPinpointDriver.class, "odometryCalc");
+        linearActuator  = hardwareMap.get(DcMotor.class, "linearActuator");
+        armMotor        = hardwareMap.get(DcMotor.class, "armMotor");
+        viperMotor      = hardwareMap.get(DcMotor.class, "viperMotor");
+
 
         // Setting direction, since some of the motors are attached backwards
         // and need to be reversed.
@@ -117,25 +97,24 @@ public class BasicOmniOpMode_Linear extends LinearOpMode
         // Since the odometry pods are not at the center of the robot, we need to include the offset.
         // We will need to see how many units offset it is. For now, we use placeholders.
         // More information on the GitHub link attached on the push message.
-        odometryCalc.setOffsets( num1 , num2 );
+        //odometryCalc.setOffsets( num1 , num2 );
 
         // Setting encoder res and directions
         // FORWARD means FRONT for front-back, and LEFT for left-right.
-        odometryCalc.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        odometryCalc.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,
-                                          GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        //odometryCalc.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        //odometryCalc.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,
+        //                                  GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
         // Recalibrates the odometry and resets the position.
-        odometryCalc.recalibrateIMU();
-        odometryCalc.resetPosAndIMU();
+        //odometryCalc.recalibrateIMU();
+        //odometryCalc.resetPosAndIMU();
 
         // Wait for the game to start (driver presses START), and updates telemetry
         telemetry.addData("Status", "Initialized");
-        telemetry.addData("Status", "Initialized");
-        telemetry.addData("X offset", odo.getXOffset());
-        telemetry.addData("Y offset", odo.getYOffset());
-        telemetry.addData("Device Version Number:", odo.getDeviceVersion());
-        telemetry.addData("Device Scalar", odo.getYawScalar());
+        //telemetry.addData("X offset", odo.getXOffset());
+        //telemetry.addData("Y offset", odo.getYOffset());
+        //telemetry.addData("Device Version Number:", odo.getDeviceVersion());
+        //telemetry.addData("Device Scalar", odo.getYawScalar());
         telemetry.update();
 
         waitForStart();
@@ -148,9 +127,12 @@ public class BasicOmniOpMode_Linear extends LinearOpMode
             double max;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral =  gamepad1.left_stick_x;
-            double yaw     =  gamepad1.right_stick_x;
+            double axial      = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+            double lateral    =  gamepad1.left_stick_x;
+            double yaw        =  gamepad1.right_stick_x;
+            double armInput   = -gamepad2.left_stick_y;
+            double viperInput = -gamepad2.right_stick_y;
+
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
@@ -173,33 +155,46 @@ public class BasicOmniOpMode_Linear extends LinearOpMode
                 rightBackPower  /= max;
             }
 
+            //Linear Actuator code
+            if (gamepad1.a) {
+                linearActuator.setPower(0.5);
+            }
+            if (gamepad1.b) {
+                linearActuator.setPower(-0.5);
+            }
+
+
             // Send calculated power to wheels
             leftFrontDrive.setPower(leftFrontPower);
             rightFrontDrive.setPower(rightFrontPower);
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
+            armMotor.setPower(armInput / 1.0);
+            viperMotor.setPower(viperInput / 0.1);
+            linearActuator.setPower(0);
+
 
             // Code to get frequency.
-            double newTime = getRuntime();
-            double loopTime = newTime - oldTime;
-            double frequency = 1.0 / loopTime;
-            oldTime = newTime;
+            //double newTime = getRuntime();
+            //double loopTime = newTime - oldTime;
+            //double frequency = 1.0 / loopTime;
+            //oldTime = newTime;
 
             // Calculations for telemetry
-            Pose2D pos = odometryCalc.getPosition();
-            String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
-            Pose2D vel = odometryCalc.getVelocity();
-            String velocity = String.format(Locale.US,"{XVel: %.3f, YVel: %.3f, HVel: %.3f}", vel.getX(DistanceUnit.MM), vel.getY(DistanceUnit.MM), vel.getHeading(AngleUnit.DEGREES));
+            //Pose2D pos = odometryCalc.getPosition();
+            //String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
+            //Pose2D vel = odometryCalc.getVelocity();
+            //String velocity = String.format(Locale.US,"{XVel: %.3f, YVel: %.3f, HVel: %.3f}", vel.getX(DistanceUnit.MM), vel.getY(DistanceUnit.MM), vel.getHeading(AngleUnit.DEGREES));
 
             // Updating telemetry on DS.
             telemetry.addData("Status: ", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right: ", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right: ", "%4.2f, %4.2f", leftBackPower, rightBackPower);
-            telemetry.addData("Position: ", data);
-            telemetry.addData("Velocity: ", velocity);
-            telemetry.addData("Status: ", odo.getDeviceStatus());
-            telemetry.addData("Pinpoint Frequency: ", odo.getFrequency()); //prints/gets the current refresh rate of the Pinpoint
-            telemetry.addData("REV Hub Frequency: ", frequency); //prints the control system refresh rate
+            //telemetry.addData("Position: ", data);
+            //telemetry.addData("Velocity: ", velocity);
+            //telemetry.addData("Status: ", odo.getDeviceStatus());
+            //telemetry.addData("Pinpoint Frequency: ", odo.getFrequency()); //prints/gets the current refresh rate of the Pinpoint
+            //telemetry.addData("REV Hub Frequency: ", frequency); //prints the control system refresh rate
             telemetry.update();
         }
     }
