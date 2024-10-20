@@ -14,7 +14,7 @@ public class LinearAcuator extends LinearOpMode {
         DcMotor motor;
         private ElapsedTime runtime     = new ElapsedTime();
         public void runOpMode() {
-            motor = hardwareMap.get(DcMotor.class, "motor");
+            motor = hardwareMap.get(DcMotor.class, "Linear Actuator");
 
             waitForStart();
 
