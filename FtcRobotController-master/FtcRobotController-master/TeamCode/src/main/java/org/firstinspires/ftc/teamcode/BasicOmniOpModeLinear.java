@@ -44,7 +44,7 @@ import java.util.Locale;
 @TeleOp(name  = "Basic: Omni Linear OpMode",
         group = "Linear OpMode"
         )
-public class BasicOmniOpMode_Linear extends LinearOpMode
+public class BasicOmniOpModeLinear extends LinearOpMode
 {
     // Declare OpMode members for each of the 4 motors.
     // The motors correspond to ports 3, 1, 2, 0 respectively.
