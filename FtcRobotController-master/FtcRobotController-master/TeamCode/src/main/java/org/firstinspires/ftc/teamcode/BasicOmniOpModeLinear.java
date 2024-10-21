@@ -131,7 +131,7 @@ public class BasicOmniOpModeLinear extends LinearOpMode
             double lateral    =  gamepad1.left_stick_x;
             double yaw        =  gamepad1.right_stick_x;
             double armInput   = -gamepad2.left_stick_y;
-            double viperInput = -gamepad2.right_stick_y;
+            double viperInput =  gamepad2.right_stick_y;
 
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
