@@ -49,6 +49,9 @@ public class BasicOmniOpModeLinear extends LinearOpMode
     // Declare OpMode members for each of the 4 motors.
     // The motors correspond to ports 3, 1, 2, 0 respectively.
     // It's not intuitive and will be changed later.
+    // The linear actuator, armMotor, and viperMotor are assigned to ports
+    // 0, 1, and 2 respectively, on the expansion hub.
+    // servoPivot is on port 0 and servoGripper is on port 1 of the Control Hub
     private ElapsedTime runtime     = new ElapsedTime();
     private DcMotor leftFrontDrive  = null;
     private DcMotor leftBackDrive   = null;
@@ -57,6 +60,8 @@ public class BasicOmniOpModeLinear extends LinearOpMode
     private DcMotor linearActuator  = null;
     private DcMotor armMotor        = null;
     private DcMotor viperMotor      = null;
+    private ServoMotor servoPivot   = null;
+    private ServoMotor servoGripper = null;
 
 
     // Declaring variables for the built-in encoders for each motor.
@@ -85,6 +90,8 @@ public class BasicOmniOpModeLinear extends LinearOpMode
         linearActuator  = hardwareMap.get(DcMotor.class, "linearActuator");
         armMotor        = hardwareMap.get(DcMotor.class, "armMotor");
         viperMotor      = hardwareMap.get(DcMotor.class, "viperMotor");
+        servoPivot      = hardwareMap.get(ServoMotor.class, "servoPivot");
+        servoGripper    = hardwareMap.get(ServoMotor.class, "servoGripper");
 
 
         // Setting direction, since some of the motors are attached backwards
@@ -93,6 +100,10 @@ public class BasicOmniOpModeLinear extends LinearOpMode
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+
+        // Declaring and initializing the servo position variables.
+        double servoPivotPosition   = 0.5;
+        double servoGripperPosition = 0.0;
 
         // Since the odometry pods are not at the center of the robot, we need to include the offset.
         // We will need to see how many units offset it is. For now, we use placeholders.
@@ -131,7 +142,9 @@ public class BasicOmniOpModeLinear extends LinearOpMode
             double lateral    =  gamepad1.left_stick_x;
             double yaw        =  gamepad1.right_stick_x;
             double armInput   = -gamepad2.left_stick_y;
-            double viperInput = -gamepad2.right_stick_y;
+            double viperInput =  gamepad2.right_stick_y;
+
+
 
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
@@ -155,7 +168,7 @@ public class BasicOmniOpModeLinear extends LinearOpMode
                 rightBackPower  /= max;
             }
 
-            //Linear Actuator code
+            // Linear Actuator code
             if (gamepad1.a) {
                 linearActuator.setPower(0.5);
             }
@@ -163,16 +176,37 @@ public class BasicOmniOpModeLinear extends LinearOpMode
                 linearActuator.setPower(-0.5);
             }
 
+            // Code to power the servos in the intake mechanism
+            if (gamepad2.a)
+            {
+                servoPivotPosition += 0.02;
+            }
+            else if (gamepad2.y)
+            {
+                servoPivotPosition -= 0.02;
+            }
+
+            if (gamepad2.x)
+            {
+                servoGripperPosition += 0.02;
+            }
+            else if (gamepad2.b)
+            {
+                servoGripperPosition -= 0.02;
+            }
 
             // Send calculated power to wheels
             leftFrontDrive.setPower(leftFrontPower);
             rightFrontDrive.setPower(rightFrontPower);
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
+
+            // Set power+position to the arm, actuator, and servos
             armMotor.setPower(armInput / 1.0);
             viperMotor.setPower(viperInput / 0.1);
             linearActuator.setPower(0);
-
+            servoGripper.setPosition(servoGripperPosition);
+            servoPivot.setPosition(servoPivotPosition);
 
             // Code to get frequency.
             //double newTime = getRuntime();
