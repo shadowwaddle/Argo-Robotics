@@ -63,19 +63,6 @@ public class BasicOmniOpModeLinear extends LinearOpMode
     private ServoMotor servoPivot   = null;
     private ServoMotor servoGripper = null;
 
-
-    // Declaring variables for the built-in encoders for each motor.
-    // We will be using the pod for getting data, going to need more reading to see
-    // if these are even necessary. We might just be directly using goToPosition without a var.
-    //private int leftFrontPosition   = null;
-    //private int leftBackPosition    = null;
-    //private int rightFrontPosition  = null;
-    //private int rightBackPosition   = null;
-
-    // Variables for the odometry calculator.
-    // oldTime will be used in frequency calculation.
-    //private GoBildaPinpointDriver odometryCalc;
-    //private double oldTime = 0.0;
     @Override
     public void runOpMode()
     {
@@ -86,7 +73,6 @@ public class BasicOmniOpModeLinear extends LinearOpMode
         leftBackDrive   = hardwareMap.get(DcMotor.class, "leftBackDrive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFrontDrive");
         rightBackDrive  = hardwareMap.get(DcMotor.class, "rightBackDrive");
-        //odometryCalc    = hardwareMap.get(GoBildaPinpointDriver.class, "odometryCalc");
         linearActuator  = hardwareMap.get(DcMotor.class, "linearActuator");
         armMotor        = hardwareMap.get(DcMotor.class, "armMotor");
         viperMotor      = hardwareMap.get(DcMotor.class, "viperMotor");
@@ -105,27 +91,8 @@ public class BasicOmniOpModeLinear extends LinearOpMode
         double servoPivotPosition   = 0.5;
         double servoGripperPosition = 0.0;
 
-        // Since the odometry pods are not at the center of the robot, we need to include the offset.
-        // We will need to see how many units offset it is. For now, we use placeholders.
-        // More information on the GitHub link attached on the push message.
-        //odometryCalc.setOffsets( num1 , num2 );
-
-        // Setting encoder res and directions
-        // FORWARD means FRONT for front-back, and LEFT for left-right.
-        //odometryCalc.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        //odometryCalc.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,
-        //                                  GoBildaPinpointDriver.EncoderDirection.FORWARD);
-
-        // Recalibrates the odometry and resets the position.
-        //odometryCalc.recalibrateIMU();
-        //odometryCalc.resetPosAndIMU();
-
         // Wait for the game to start (driver presses START), and updates telemetry
         telemetry.addData("Status", "Initialized");
-        //telemetry.addData("X offset", odo.getXOffset());
-        //telemetry.addData("Y offset", odo.getYOffset());
-        //telemetry.addData("Device Version Number:", odo.getDeviceVersion());
-        //telemetry.addData("Device Scalar", odo.getYawScalar());
         telemetry.update();
 
         waitForStart();
@@ -208,27 +175,11 @@ public class BasicOmniOpModeLinear extends LinearOpMode
             servoGripper.setPosition(servoGripperPosition);
             servoPivot.setPosition(servoPivotPosition);
 
-            // Code to get frequency.
-            //double newTime = getRuntime();
-            //double loopTime = newTime - oldTime;
-            //double frequency = 1.0 / loopTime;
-            //oldTime = newTime;
-
-            // Calculations for telemetry
-            //Pose2D pos = odometryCalc.getPosition();
-            //String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
-            //Pose2D vel = odometryCalc.getVelocity();
-            //String velocity = String.format(Locale.US,"{XVel: %.3f, YVel: %.3f, HVel: %.3f}", vel.getX(DistanceUnit.MM), vel.getY(DistanceUnit.MM), vel.getHeading(AngleUnit.DEGREES));
 
             // Updating telemetry on DS.
             telemetry.addData("Status: ", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right: ", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right: ", "%4.2f, %4.2f", leftBackPower, rightBackPower);
-            //telemetry.addData("Position: ", data);
-            //telemetry.addData("Velocity: ", velocity);
-            //telemetry.addData("Status: ", odo.getDeviceStatus());
-            //telemetry.addData("Pinpoint Frequency: ", odo.getFrequency()); //prints/gets the current refresh rate of the Pinpoint
-            //telemetry.addData("REV Hub Frequency: ", frequency); //prints the control system refresh rate
             telemetry.update();
         }
     }
