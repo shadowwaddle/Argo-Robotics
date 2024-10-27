@@ -30,9 +30,11 @@
 package org.firstinspires.ftc.robotcontroller.external.samples;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -43,7 +45,7 @@ import java.util.Locale;
 
 @TeleOp(name  = "Basic: Omni Linear OpMode",
         group = "Linear OpMode"
-        )
+)
 public class BasicOmniOpModeLinear extends LinearOpMode
 {
     // Declare OpMode members for each of the 4 motors.
@@ -52,16 +54,16 @@ public class BasicOmniOpModeLinear extends LinearOpMode
     // The linear actuator, armMotor, and viperMotor are assigned to ports
     // 0, 1, and 2 respectively, on the expansion hub.
     // servoPivot is on port 0 and servoGripper is on port 1 of the Control Hub
-    private ElapsedTime runtime     = new ElapsedTime();
-    private DcMotor leftFrontDrive  = null;
-    private DcMotor leftBackDrive   = null;
-    private DcMotor rightFrontDrive = null;
-    private DcMotor rightBackDrive  = null;
-    private DcMotor linearActuator  = null;
-    private DcMotor armMotor        = null;
-    private DcMotor viperMotor      = null;
-    private ServoMotor servoPivot   = null;
-    private ServoMotor servoGripper = null;
+    private ElapsedTime runtime       = new ElapsedTime();
+    private DcMotorEx leftFrontDrive  = null;
+    private DcMotorEx leftBackDrive   = null;
+    private DcMotorEx rightFrontDrive = null;
+    private DcMotorEx rightBackDrive  = null;
+    private DcMotorEx linearActuator  = null;
+    private DcMotorEx armMotor        = null;
+    private DcMotorEx viperMotor      = null;
+    private CRServo servoPivot        = null;
+    private CRServo servoGripper      = null;
 
     @Override
     public void runOpMode()
@@ -69,23 +71,23 @@ public class BasicOmniOpModeLinear extends LinearOpMode
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "leftFrontDrive");
-        leftBackDrive   = hardwareMap.get(DcMotor.class, "leftBackDrive");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFrontDrive");
-        rightBackDrive  = hardwareMap.get(DcMotor.class, "rightBackDrive");
-        linearActuator  = hardwareMap.get(DcMotor.class, "linearActuator");
-        armMotor        = hardwareMap.get(DcMotor.class, "armMotor");
-        viperMotor      = hardwareMap.get(DcMotor.class, "viperMotor");
-        servoPivot      = hardwareMap.get(ServoMotor.class, "servoPivot");
-        servoGripper    = hardwareMap.get(ServoMotor.class, "servoGripper");
+        leftFrontDrive  = hardwareMap.get(DcMotorEx.class, "leftFrontDrive");
+        leftBackDrive   = hardwareMap.get(DcMotorEx.class, "leftBackDrive");
+        rightFrontDrive = hardwareMap.get(DcMotorEx.class, "rightFrontDrive");
+        rightBackDrive  = hardwareMap.get(DcMotorEx.class, "rightBackDrive");
+        linearActuator  = hardwareMap.get(DcMotorEx.class, "linearActuator");
+        armMotor        = hardwareMap.get(DcMotorEx.class, "armMotor");
+        viperMotor      = hardwareMap.get(DcMotorEx.class, "viperMotor");
+        servoPivot      = hardwareMap.get(CRServo.class, "servoPivot");
+        servoGripper    = hardwareMap.get(CRServo.class, "servoGripper");
 
 
         // Setting direction, since some of the motors are attached backwards
         // and need to be reversed.
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        leftBackDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotorEx.Direction.FORWARD);
+        rightBackDrive.setDirection(DcMotorEx.Direction.FORWARD);
 
         // Declaring and initializing the servo position variables.
         double servoPivotPosition   = 0.5;
@@ -172,8 +174,8 @@ public class BasicOmniOpModeLinear extends LinearOpMode
             armMotor.setPower(armInput / 1.0);
             viperMotor.setPower(viperInput / 0.1);
             linearActuator.setPower(0);
-            servoGripper.setPosition(servoGripperPosition);
-            servoPivot.setPosition(servoPivotPosition);
+            //servoGripper.setPosition(servoGripperPosition);
+            //servoPivot.setPosition(servoPivotPosition);
 
 
             // Updating telemetry on DS.
