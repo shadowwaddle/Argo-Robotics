@@ -43,7 +43,7 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
     private DcMotorEx leftBackDrive = null;
     private DcMotorEx rightFrontDrive = null;
     private DcMotorEx rightBackDrive = null;
-    private DcMotorEx linearActuator = null;
+    // private DcMotorEx linearActuator = null; <- RIP might use later
     private DcMotorEx armMotor = null;
     private DcMotorEx viperMotor = null;
     private CRServo servoPivot = null;
@@ -52,11 +52,13 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
     @Override
     public void runOpMode() {
 
+        // Initialize the hardware variables. Note that the strings used here must correspond
+        // to the names assigned during the robot configuration step on the DS or RC devices.
         leftFrontDrive = hardwareMap.get(DcMotorEx.class, "leftFrontDrive");
         leftBackDrive = hardwareMap.get(DcMotorEx.class, "leftBackDrive");
         rightFrontDrive = hardwareMap.get(DcMotorEx.class, "rightFrontDrive");
         rightBackDrive = hardwareMap.get(DcMotorEx.class, "rightBackDrive");
-        linearActuator = hardwareMap.get(DcMotorEx.class, "linearActuator");
+        //linearActuator = hardwareMap.get(DcMotorEx.class, "linearActuator");   <- RIP might use later
         armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
         viperMotor = hardwareMap.get(DcMotorEx.class, "viperMotor");
         servoPivot = hardwareMap.get(CRServo.class, "servoPivot");
@@ -67,19 +69,28 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
         rightFrontDrive.setDirection(DcMotorEx.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotorEx.Direction.FORWARD);
 
+        // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
         waitForStart();
         runtime.reset();
 
+        // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
+           // Robot movement control
             double axial = -gamepad1.left_stick_y;
             double lateral = gamepad1.left_stick_x;
             double yaw = gamepad1.right_stick_x;
+           
+            // Robot pivot 
             double armInput = -gamepad2.left_stick_y;
+           
+            // Robot viper
             double viperInput = gamepad2.right_stick_y;
 
+            // calculations for movement power values
             double leftFrontPower = axial + lateral + yaw;
             double rightFrontPower = axial - lateral - yaw;
             double leftBackPower = axial - lateral + yaw;
@@ -101,13 +112,14 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
-            if (gamepad1.a) {
-                linearActuator.setPower(0.5);
-            } else if (gamepad1.b) {
-                linearActuator.setPower(-0.5);
-            } else {
-                linearActuator.setPower(0);
-            }
+            // RIP LINEAR ACTUATOR
+            // if (gamepad1.a) {
+            //     linearActuator.setPower(0.5);
+            // } else if (gamepad1.b) {
+            //     linearActuator.setPower(-0.5);
+            // } else {
+            //     linearActuator.setPower(0);
+            // }
 
             armMotor.setPower(armInput);
             viperMotor.setPower(viperInput / 0.1);
