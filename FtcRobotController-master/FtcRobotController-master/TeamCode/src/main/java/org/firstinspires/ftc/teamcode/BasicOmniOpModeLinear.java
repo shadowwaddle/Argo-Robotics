@@ -90,7 +90,7 @@ public class BasicOmniOpModeLinear extends LinearOpMode
         rightBackDrive.setDirection(DcMotorEx.Direction.FORWARD);
 
         // Declaring and initializing the servo position variables.
-        double servoPivotPosition   = 0.5;
+        double servoPivotPosition   = 0.0;
         double servoGripperPosition = 0.0;
 
         // Wait for the game to start (driver presses START), and updates telemetry
@@ -122,6 +122,10 @@ public class BasicOmniOpModeLinear extends LinearOpMode
             double rightFrontPower = axial - lateral - yaw;
             double leftBackPower   = axial - lateral + yaw;
             double rightBackPower  = axial + lateral - yaw;
+            
+            double pivotRight = 1.0;
+            double pivotLeft = -1.0;
+            double noPivot = 0.0;
 
             // Normalize the values so no wheel power exceeds 100%
             // This ensures that the robot maintains the desired motion.
@@ -148,20 +152,22 @@ public class BasicOmniOpModeLinear extends LinearOpMode
             // Code to power the servos in the intake mechanism
             if (gamepad2.a)
             {
-                servoPivotPosition += 0.02;
+                servoPivot.setPower(pivotLeft);
             }
             else if (gamepad2.y)
             {
-                servoPivotPosition -= 0.02;
+                servoPivot.setPower(pivotRight);
+            } else {
+                servoPivot.setPower(noPivot);
             }
 
             if (gamepad2.x)
             {
-                servoGripperPosition += 0.02;
+                servoGripper.setPower(1.0);
             }
             else if (gamepad2.b)
             {
-                servoGripperPosition -= 0.02;
+                servoGripper.setPower(-1.0);
             }
 
             // Send calculated power to wheels
@@ -174,8 +180,8 @@ public class BasicOmniOpModeLinear extends LinearOpMode
             armMotor.setPower(armInput / 1.0);
             viperMotor.setPower(viperInput / 0.1);
             linearActuator.setPower(0);
-            //servoGripper.setPosition(servoGripperPosition);
-            //servoPivot.setPosition(servoPivotPosition);
+            //servoGripper.setPower(servoGripperPosition);
+            //servoPivot.setPower(servoPivotPosition);
 
 
             // Updating telemetry on DS.
