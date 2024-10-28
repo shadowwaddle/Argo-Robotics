@@ -90,7 +90,7 @@ public class BasicOmniOpModeLinear extends LinearOpMode
         rightBackDrive.setDirection(DcMotorEx.Direction.FORWARD);
 
         // Declaring and initializing the servo position variables.
-        double servoPivotPosition   = 0.5;
+        double servoPivotPosition   = 0.0;
         double servoGripperPosition = 0.0;
 
         // Wait for the game to start (driver presses START), and updates telemetry
