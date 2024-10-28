@@ -35,15 +35,19 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name  = "Basic: Omni Linear OpMode", group = "Linear OpMode")
+@TeleOp(name = "Basic: Omni Linear OpMode", group = "Linear OpMode")
 public class BasicOmniOpModeLinear extends LinearOpMode {
 
+    // Timer to track runtime
     private ElapsedTime runtime = new ElapsedTime();
+
+    // Drivetrain motors
     private DcMotorEx leftFrontDrive = null;
     private DcMotorEx leftBackDrive = null;
     private DcMotorEx rightFrontDrive = null;
     private DcMotorEx rightBackDrive = null;
-    // private DcMotorEx linearActuator = null; <- RIP might use later
+
+    // Additional motors and servos
     private DcMotorEx armMotor = null;
     private DcMotorEx viperMotor = null;
     private CRServo servoPivot = null;
@@ -52,50 +56,52 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration step on the DS or RC devices.
+        // Initialize the hardware variables with names that match the robot configuration
         leftFrontDrive = hardwareMap.get(DcMotorEx.class, "leftFrontDrive");
         leftBackDrive = hardwareMap.get(DcMotorEx.class, "leftBackDrive");
         rightFrontDrive = hardwareMap.get(DcMotorEx.class, "rightFrontDrive");
         rightBackDrive = hardwareMap.get(DcMotorEx.class, "rightBackDrive");
-        //linearActuator = hardwareMap.get(DcMotorEx.class, "linearActuator");   <- RIP might use later
+
         armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
         viperMotor = hardwareMap.get(DcMotorEx.class, "viperMotor");
         servoPivot = hardwareMap.get(CRServo.class, "servoPivot");
         servoGripper = hardwareMap.get(CRServo.class, "servoGripper");
 
+        // Reverse direction for left motors to ensure correct movement
         leftFrontDrive.setDirection(DcMotorEx.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotorEx.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotorEx.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotorEx.Direction.FORWARD);
 
-        // Wait for the game to start (driver presses START)
+        // Display initialization status
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        // Wait for the game to start (driver presses START)
         waitForStart();
         runtime.reset();
 
-        // run until the end of the match (driver presses STOP)
+        // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-           // Robot movement control
-            double axial = -gamepad1.left_stick_y;
-            double lateral = gamepad1.left_stick_x;
-            double yaw = gamepad1.right_stick_x;
-           
-            // Robot pivot 
+            // Read joystick inputs for robot movement control
+            double axial = -gamepad1.left_stick_y;     // Forward and backward
+            double lateral = gamepad1.left_stick_x;    // Strafing left and right
+            double yaw = gamepad1.right_stick_x;       // Rotation
+
+            // Arm control (Gamepad 2 left stick)
             double armInput = -gamepad2.left_stick_y;
-           
-            // Robot viper
+
+            // Viper control (Gamepad 2 right stick)
             double viperInput = gamepad2.right_stick_y;
 
-            // calculations for movement power values
+            // Calculate power for each wheel based on movement control inputs
             double leftFrontPower = axial + lateral + yaw;
             double rightFrontPower = axial - lateral - yaw;
             double leftBackPower = axial - lateral + yaw;
             double rightBackPower = axial + lateral - yaw;
 
+            // Normalize the power values to ensure none exceed 100%
             double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
             max = Math.max(max, Math.abs(leftBackPower));
             max = Math.max(max, Math.abs(rightBackPower));
@@ -107,40 +113,36 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
                 rightBackPower /= max;
             }
 
+            // Set calculated power to each wheel motor
             leftFrontDrive.setPower(leftFrontPower);
             rightFrontDrive.setPower(rightFrontPower);
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
-            // RIP LINEAR ACTUATOR
-            // if (gamepad1.a) {
-            //     linearActuator.setPower(0.5);
-            // } else if (gamepad1.b) {
-            //     linearActuator.setPower(-0.5);
-            // } else {
-            //     linearActuator.setPower(0);
-            // }
+            // Arm and viper motor controls
+            armMotor.setPower(armInput);                  // Set power based on Gamepad 2 left stick
+            viperMotor.setPower(viperInput / 0.1);        // Adjust speed scaling as needed
 
-            armMotor.setPower(armInput);
-            viperMotor.setPower(viperInput / 0.1);
-
-            // Only apply power to the servo when a button is pressed; otherwise, leave it alone
+            // Servo controls for pivoting and gripping mechanism
+            // Control the pivot servo with Gamepad 2 buttons A and Y
             if (gamepad2.a) {
-                servoPivot.setPower(-1.0);
+                servoPivot.setPower(-1.0);    // Move pivot to one direction
+            } else if (gamepad2.x) {
+                servoPivot.setPower(1.0);     // Move pivot to the other direction
+            } else {
+                servoPivot.setPower(0.0);     // Stop the pivot servo
+            }
+
+            // Control the gripper servo with Gamepad 2 buttons X and B
+            if (gamepad2.b) {
+                servoGripper.setPower(1.0);   // Close the gripper
             } else if (gamepad2.y) {
-                servoPivot.setPower(1.0);
+                servoGripper.setPower(-1.0);  // Open the gripper
             } else {
-                servoPivot.setPower(0.0);  // Stop the servo without resetting its position
+                servoGripper.setPower(0.0);   // Stop the gripper servo
             }
 
-            if (gamepad2.x) {
-                servoGripper.setPower(1.0);
-            } else if (gamepad2.b) {
-                servoGripper.setPower(-1.0);
-            } else {
-                servoGripper.setPower(0.0);  // Stop the servo without resetting its position
-            }
-
+            // Display telemetry data for debugging and status updates
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/right power", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back left/right power", "%4.2f, %4.2f", leftBackPower, rightBackPower);
