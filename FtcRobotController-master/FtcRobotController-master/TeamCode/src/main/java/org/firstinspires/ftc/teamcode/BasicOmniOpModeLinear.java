@@ -73,6 +73,23 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
         rightFrontDrive.setDirection(DcMotorEx.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotorEx.Direction.FORWARD);
 
+        //Encoder stuff!:
+        // Reset and initialize encoders for armMotor and viperMotor
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        viperMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        // Set motors to run using encoders
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        viperMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Sample target positions in encoder counts for specific arm angles and slide distances
+        // Define target encoder counts based on estimated positions (KEEP IN MIND THESE ARE TEMPORARY UNTIL FURTHER CALCULATION / TRIAL AND ERROR
+        int ARM_POSITION_SKYWARD = 26;         // ~90 degrees (pointing straight up)
+        int ARM_POSITION_REST = 0;             // ~-20 degrees (rest position)
+        int VIPER_SLIDE_MAX_POSITION = 3000;    // Example value for full extension
+        int VIPER_SLIDE_MIN_POSITION = 0;       // Retracted position
+
+
         // Display initialization status
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -84,16 +101,11 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
         // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
+            // Player 1 Controls ( Chassis )
             // Read joystick inputs for robot movement control
             double axial = -gamepad1.left_stick_y;     // Forward and backward
             double lateral = gamepad1.left_stick_x;    // Strafing left and right
             double yaw = gamepad1.right_stick_x;       // Rotation
-
-            // Arm control (Gamepad 2 left stick)
-            double armInput = -gamepad2.left_stick_y;
-
-            // Viper control (Gamepad 2 right stick)
-            double viperInput = gamepad2.right_stick_y;
 
             // Calculate power for each wheel based on movement control inputs
             double leftFrontPower = axial + lateral + yaw;
@@ -119,9 +131,17 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
-            // Arm and viper motor controls
-            armMotor.setPower(armInput);                  // Set power based on Gamepad 2 left stick
+
+
+            // Player 2 Controls ( Arm and slide and intake )
+            // Arm control (Gamepad 2 left stick)
+            double armInput = -gamepad2.left_stick_y;
+            armMotor.setPower(armInput);
+
+            // Viper control (Gamepad 2 right stick)
+            double viperInput = gamepad2.right_stick_y;
             viperMotor.setPower(viperInput / 0.1);        // Adjust speed scaling as needed
+
 
             // Servo controls for pivoting and gripping mechanism
             // Control the pivot servo with Gamepad 2 buttons A and Y
@@ -132,7 +152,6 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
             } else {
                 servoPivot.setPower(0.0);     // Stop the pivot servo
             }
-
             // Control the gripper servo with Gamepad 2 buttons X and B
             if (gamepad2.b) {
                 servoGripper.setPower(1.0);   // Close the gripper
@@ -141,6 +160,7 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
             } else {
                 servoGripper.setPower(0.0);   // Stop the gripper servo
             }
+
 
             // Display telemetry data for debugging and status updates
             telemetry.addData("Status", "Run Time: " + runtime.toString());
