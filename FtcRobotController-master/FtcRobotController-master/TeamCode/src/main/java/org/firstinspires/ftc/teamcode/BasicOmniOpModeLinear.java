@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.robotcontroller.external.samples;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -53,6 +54,9 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
     private CRServo servoPivot = null;
     private CRServo servoGripper = null;
 
+    // Flag to check if arm is moving to a preset position
+    private boolean isArmInPresetPosition = false;
+
     @Override
     public void runOpMode() {
 
@@ -73,8 +77,14 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
         rightFrontDrive.setDirection(DcMotorEx.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotorEx.Direction.FORWARD);
 
-        //Encoder stuff!:
-        // Reset and initialize encoders for armMotor and viperMotor
+        // Set ZeroPowerBehavior to BRAKE for all drivetrain motors
+        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
+        // Encoder initialization for armMotor and viperMotor
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         viperMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -82,15 +92,12 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         viperMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        // Sample target positions in encoder counts for specific arm angles and slide distances
-        // Define target encoder counts based on estimated positions (KEEP IN MIND THESE ARE TEMPORARY UNTIL FURTHER CALCULATION / TRIAL AND ERROR
-        int ARM_POSITION_SKYWARD = 26;         // ~90 degrees (pointing straight up)
-        int ARM_POSITION_REST = 0;             // ~-20 degrees (rest position)
-        int VIPER_SLIDE_MAX_POSITION = 3000;    // Example value for full extension
-        int VIPER_SLIDE_MIN_POSITION = 0;       // Retracted position
+        // Constants for arm and viper positions
+        int ARM_POSITION_REST = 0;         // 0 Degrees
+        int ARM_POSITION_DROP = -2272;     // Example for 100 degrees
+        int VIPER_REST = 0;
+        int VIPER_MAX_EXTENSION = 1000;
 
-
-        // Display initialization status
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -101,8 +108,7 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
         // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            // Player 1 Controls ( Chassis )
-            // Read joystick inputs for robot movement control
+            // Player 1 Controls (Chassis)
             double axial = -gamepad1.left_stick_y;     // Forward and backward
             double lateral = gamepad1.left_stick_x;    // Strafing left and right
             double yaw = gamepad1.right_stick_x;       // Rotation
@@ -131,41 +137,71 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
+            // Arm Control with preset positions
+            if (gamepad2.x && !isArmInPresetPosition) {
+                // Move to drop position
+                armMotor.setTargetPosition(ARM_POSITION_DROP);
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setPower(1); // Adjust power as needed
+                isArmInPresetPosition = true;
+            } else if (gamepad2.y && !isArmInPresetPosition) {
+                // Move to rest position
+                armMotor.setTargetPosition(ARM_POSITION_REST);
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setPower(1); // Adjust power as needed
+                isArmInPresetPosition = true;
+            }
 
+            // If the arm has reached its target, reset the flag and stop the motor
+            if (!armMotor.isBusy() && isArmInPresetPosition) {
+                isArmInPresetPosition = false;
+                armMotor.setPower(0);  // Stop the motor when it reaches the position
+                armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // Switch back to manual control
+            }
 
-            // Player 2 Controls ( Arm and slide and intake )
-            // Arm control (Gamepad 2 left stick)
-            double armInput = -gamepad2.left_stick_y;
-            armMotor.setPower(armInput);
+            // Allow fine-tuning adjustments with the left stick if no preset position is being targeted
+            if (!isArmInPresetPosition) {
+                double armManualInput = -gamepad2.left_stick_y;  // Fine-tuning adjustments
+                armMotor.setPower(armManualInput * 0.1);  // Scale power for finer control
+            }
 
-            // Viper control (Gamepad 2 right stick)
-            double viperInput = gamepad2.right_stick_y;
-            viperMotor.setPower(viperInput / 0.1);        // Adjust speed scaling as needed
-
+            // Viper Slide Control
+            if (gamepad2.a) {
+                // Retract slide
+                viperMotor.setTargetPosition(VIPER_REST);
+                viperMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                viperMotor.setPower(1.0); // Set power as needed
+            } else if (gamepad2.b) {
+                // Extend slide
+                viperMotor.setTargetPosition(VIPER_MAX_EXTENSION);
+                viperMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                viperMotor.setPower(1.0); // Set power as needed
+            }
 
             // Servo controls for pivoting and gripping mechanism
-            // Control the pivot servo with Gamepad 2 buttons A and Y
-            if (gamepad2.a) {
-                servoPivot.setPower(-1.0);    // Move pivot to one direction
-            } else if (gamepad2.x) {
-                servoPivot.setPower(1.0);     // Move pivot to the other direction
+            if (gamepad2.left_bumper) {
+                servoPivot.setPower(-1.0);    // Move pivot in one direction
+            } else if (gamepad2.right_bumper) {
+                servoPivot.setPower(1.0);     // Move pivot in the other direction
             } else {
                 servoPivot.setPower(0.0);     // Stop the pivot servo
             }
-            // Control the gripper servo with Gamepad 2 buttons X and B
-            if (gamepad2.b) {
+
+            // Control the gripper servo with Gamepad 2 left and right triggers
+            if (gamepad2.left_trigger > 0.5) {
                 servoGripper.setPower(1.0);   // Close the gripper
-            } else if (gamepad2.y) {
+            } else if (gamepad2.right_trigger > 0.5) {
                 servoGripper.setPower(-1.0);  // Open the gripper
             } else {
                 servoGripper.setPower(0.0);   // Stop the gripper servo
             }
 
-
             // Display telemetry data for debugging and status updates
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/right power", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back left/right power", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+            telemetry.addData("Arm Position (ticks)", armMotor.getCurrentPosition());
+            telemetry.addData("Viper Slide Position (ticks)", viperMotor.getCurrentPosition());
             telemetry.update();
         }
     }
