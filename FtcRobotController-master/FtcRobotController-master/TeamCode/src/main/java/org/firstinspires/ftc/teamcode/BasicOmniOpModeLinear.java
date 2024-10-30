@@ -77,7 +77,7 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
         rightFrontDrive.setDirection(DcMotorEx.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotorEx.Direction.FORWARD);
 
-        // Set ZeroPowerBehavior to BRAKE for all drivetrain motors
+        // Set ZeroPowerBehavior to FLOAT for all drivetrain motors
         leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -94,9 +94,9 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
 
         // Constants for arm and viper positions
         int ARM_POSITION_REST = 0;         // 0 Degrees
-        int ARM_POSITION_DROP = -2272;     // Example for 100 degrees
+        int ARM_POSITION_DROP = 2272;     // Example for 100 degrees
         int VIPER_REST = 0;
-        int VIPER_MAX_EXTENSION = 1000;
+        int VIPER_MAX_EXTENSION = -891;
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -108,7 +108,7 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
         // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            // Player 1 Controls (Chassis)
+            // PLAYER 1 Controls (Chassis)
             double axial = -gamepad1.left_stick_y;     // Forward and backward
             double lateral = gamepad1.left_stick_x;    // Strafing left and right
             double yaw = gamepad1.right_stick_x;       // Rotation
@@ -137,32 +137,49 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
+
+            // PLAYER 2 Controls (Pivot  Slide Intake)
             // Arm Control with preset positions
             if (gamepad2.x && !isArmInPresetPosition) {
                 // Move to drop position
-                armMotor.setTargetPosition(ARM_POSITION_DROP);
+                int targetPosition = ARM_POSITION_DROP;
+                armMotor.setTargetPosition(targetPosition);
                 armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armMotor.setPower(1); // Adjust power as needed
                 isArmInPresetPosition = true;
             } else if (gamepad2.y && !isArmInPresetPosition) {
                 // Move to rest position
-                armMotor.setTargetPosition(ARM_POSITION_REST);
+                int targetPosition = ARM_POSITION_REST;
+                armMotor.setTargetPosition(targetPosition);
                 armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armMotor.setPower(1); // Adjust power as needed
                 isArmInPresetPosition = true;
             }
 
-            // If the arm has reached its target, reset the flag and stop the motor
-            if (!armMotor.isBusy() && isArmInPresetPosition) {
-                isArmInPresetPosition = false;
-                armMotor.setPower(0);  // Stop the motor when it reaches the position
-                armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // Switch back to manual control
+            // If arm is moving to a preset position, use proportional control
+            if (isArmInPresetPosition) {
+                int currentPosition = armMotor.getCurrentPosition();
+                int error = armMotor.getTargetPosition() - currentPosition;
+
+                double power;
+                if (Math.abs(error) < 100) {  // If close to target
+                    power = 0.2;  // Low power to minimize overshoot
+                } else {
+                    power = 1;  // Regular power for faster movement
+                }
+
+                armMotor.setPower(power);
+
+                // If the arm has reached its target, reset the flag and stop the motor
+                if (!armMotor.isBusy()) {
+                    isArmInPresetPosition = false;
+                    armMotor.setPower(0);  // Stop the motor when it reaches the position
+                    armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // Switch back to manual control
+                }
             }
 
             // Allow fine-tuning adjustments with the left stick if no preset position is being targeted
             if (!isArmInPresetPosition) {
                 double armManualInput = -gamepad2.left_stick_y;  // Fine-tuning adjustments
-                armMotor.setPower(armManualInput * 0.1);  // Scale power for finer control
+                armMotor.setPower(armManualInput * 0.2);  // Scale power for finer control
             }
 
             // Viper Slide Control
