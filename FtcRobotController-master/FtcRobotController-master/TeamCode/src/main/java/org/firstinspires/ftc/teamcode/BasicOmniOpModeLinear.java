@@ -29,159 +29,196 @@
 
 package org.firstinspires.ftc.robotcontroller.external.samples;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+@TeleOp(name = "Basic: Omni Linear OpMode", group = "Linear OpMode")
+public class BasicOmniOpModeLinear extends LinearOpMode {
 
-import java.util.Locale;
+    // Timer to track runtime
+    private ElapsedTime runtime = new ElapsedTime();
 
-@TeleOp(name  = "Basic: Omni Linear OpMode",
-        group = "Linear OpMode"
-)
-public class BasicOmniOpModeLinear extends LinearOpMode
-{
-    // Declare OpMode members for each of the 4 motors.
-    // The motors correspond to ports 3, 1, 2, 0 respectively.
-    // It's not intuitive and will be changed later.
-    // The linear actuator, armMotor, and viperMotor are assigned to ports
-    // 0, 1, and 2 respectively, on the expansion hub.
-    // servoPivot is on port 0 and servoGripper is on port 1 of the Control Hub
-    private ElapsedTime runtime       = new ElapsedTime();
-    private DcMotorEx leftFrontDrive  = null;
-    private DcMotorEx leftBackDrive   = null;
+    // Drivetrain motors
+    private DcMotorEx leftFrontDrive = null;
+    private DcMotorEx leftBackDrive = null;
     private DcMotorEx rightFrontDrive = null;
-    private DcMotorEx rightBackDrive  = null;
-    private DcMotorEx linearActuator  = null;
-    private DcMotorEx armMotor        = null;
-    private DcMotorEx viperMotor      = null;
-    private CRServo servoPivot        = null;
-    private CRServo servoGripper      = null;
+    private DcMotorEx rightBackDrive = null;
+
+    // Additional motors and servos
+    private DcMotorEx armMotor = null;
+    private DcMotorEx viperMotor = null;
+    private CRServo servoPivot = null;
+    private CRServo servoGripper = null;
+
+    // Flag to check if arm is moving to a preset position
+    private boolean isArmInPresetPosition = false;
 
     @Override
-    public void runOpMode()
-    {
+    public void runOpMode() {
 
-        // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration step on the DS or RC devices.
-        leftFrontDrive  = hardwareMap.get(DcMotorEx.class, "leftFrontDrive");
-        leftBackDrive   = hardwareMap.get(DcMotorEx.class, "leftBackDrive");
+        // Initialize the hardware variables with names that match the robot configuration
+        leftFrontDrive = hardwareMap.get(DcMotorEx.class, "leftFrontDrive");
+        leftBackDrive = hardwareMap.get(DcMotorEx.class, "leftBackDrive");
         rightFrontDrive = hardwareMap.get(DcMotorEx.class, "rightFrontDrive");
-        rightBackDrive  = hardwareMap.get(DcMotorEx.class, "rightBackDrive");
-        linearActuator  = hardwareMap.get(DcMotorEx.class, "linearActuator");
-        armMotor        = hardwareMap.get(DcMotorEx.class, "armMotor");
-        viperMotor      = hardwareMap.get(DcMotorEx.class, "viperMotor");
-        servoPivot      = hardwareMap.get(CRServo.class, "servoPivot");
-        servoGripper    = hardwareMap.get(CRServo.class, "servoGripper");
+        rightBackDrive = hardwareMap.get(DcMotorEx.class, "rightBackDrive");
 
+        armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
+        viperMotor = hardwareMap.get(DcMotorEx.class, "viperMotor");
+        servoPivot = hardwareMap.get(CRServo.class, "servoPivot");
+        servoGripper = hardwareMap.get(CRServo.class, "servoGripper");
 
-        // Setting direction, since some of the motors are attached backwards
-        // and need to be reversed.
+        // Reverse direction for left motors to ensure correct movement
         leftFrontDrive.setDirection(DcMotorEx.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotorEx.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotorEx.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotorEx.Direction.FORWARD);
 
-        // Declaring and initializing the servo position variables.
-        double servoPivotPosition   = 0.5;
-        double servoGripperPosition = 0.0;
+        // Set ZeroPowerBehavior to FLOAT for all drivetrain motors
+        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        // Wait for the game to start (driver presses START), and updates telemetry
+
+        // Encoder initialization for armMotor and viperMotor
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        viperMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        // Set motors to run using encoders
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        viperMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Constants for arm and viper positions
+        int ARM_POSITION_REST = 0;         // 0 Degrees
+        int ARM_POSITION_DROP = 2272;     // Example for 100 degrees
+        int VIPER_REST = 0;
+        int VIPER_MAX_EXTENSION = -891;
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        // Wait for the game to start (driver presses START)
         waitForStart();
         runtime.reset();
 
         // Run until the end of the match (driver presses STOP)
-        while (opModeIsActive())
-        {
-            // Max is used later for speed control.
-            double max;
+        while (opModeIsActive()) {
 
-            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial      = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral    =  gamepad1.left_stick_x;
-            double yaw        =  gamepad1.right_stick_x;
-            double armInput   = -gamepad2.left_stick_y;
-            double viperInput =  gamepad2.right_stick_y;
+            // PLAYER 1 Controls (Chassis)
+            double axial = -gamepad1.left_stick_y;     // Forward and backward
+            double lateral = gamepad1.left_stick_x;    // Strafing left and right
+            double yaw = gamepad1.right_stick_x;       // Rotation
 
-
-
-
-            // Combine the joystick requests for each axis-motion to determine each wheel's power.
-            // Set up a variable for each drive wheel to save the power level for telemetry.
-            double leftFrontPower  = axial + lateral + yaw;
+            // Calculate power for each wheel based on movement control inputs
+            double leftFrontPower = axial + lateral + yaw;
             double rightFrontPower = axial - lateral - yaw;
-            double leftBackPower   = axial - lateral + yaw;
-            double rightBackPower  = axial + lateral - yaw;
+            double leftBackPower = axial - lateral + yaw;
+            double rightBackPower = axial + lateral - yaw;
 
-            // Normalize the values so no wheel power exceeds 100%
-            // This ensures that the robot maintains the desired motion.
-            max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+            // Normalize the power values to ensure none exceed 100%
+            double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
             max = Math.max(max, Math.abs(leftBackPower));
             max = Math.max(max, Math.abs(rightBackPower));
 
-            if (max > 0.1)
-            {
-                leftFrontPower  /= max;
+            if (max > 1.0) {
+                leftFrontPower /= max;
                 rightFrontPower /= max;
-                leftBackPower   /= max;
-                rightBackPower  /= max;
+                leftBackPower /= max;
+                rightBackPower /= max;
             }
 
-            // Linear Actuator code
-            if (gamepad1.a) {
-                linearActuator.setPower(0.5);
-            }
-            if (gamepad1.b) {
-                linearActuator.setPower(-0.5);
-            }
-
-            // Code to power the servos in the intake mechanism
-            if (gamepad2.a)
-            {
-                servoPivotPosition += 0.02;
-            }
-            else if (gamepad2.y)
-            {
-                servoPivotPosition -= 0.02;
-            }
-
-            if (gamepad2.x)
-            {
-                servoGripperPosition += 0.02;
-            }
-            else if (gamepad2.b)
-            {
-                servoGripperPosition -= 0.02;
-            }
-
-            // Send calculated power to wheels
+            // Set calculated power to each wheel motor
             leftFrontDrive.setPower(leftFrontPower);
             rightFrontDrive.setPower(rightFrontPower);
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
-            // Set power+position to the arm, actuator, and servos
-            armMotor.setPower(armInput / 1.0);
-            viperMotor.setPower(viperInput / 0.1);
-            linearActuator.setPower(0);
-            //servoGripper.setPosition(servoGripperPosition);
-            //servoPivot.setPosition(servoPivotPosition);
 
+            // PLAYER 2 Controls (Pivot  Slide Intake)
+            // Arm Control with preset positions
+            if (gamepad2.x && !isArmInPresetPosition) {
+                // Move to drop position
+                int targetPosition = ARM_POSITION_DROP;
+                armMotor.setTargetPosition(targetPosition);
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                isArmInPresetPosition = true;
+            } else if (gamepad2.y && !isArmInPresetPosition) {
+                // Move to rest position
+                int targetPosition = ARM_POSITION_REST;
+                armMotor.setTargetPosition(targetPosition);
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                isArmInPresetPosition = true;
+            }
 
-            // Updating telemetry on DS.
-            telemetry.addData("Status: ", "Run Time: " + runtime.toString());
-            telemetry.addData("Front left/Right: ", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
-            telemetry.addData("Back  left/Right: ", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+            // If arm is moving to a preset position, use proportional control
+            if (isArmInPresetPosition) {
+                int currentPosition = armMotor.getCurrentPosition();
+                int error = armMotor.getTargetPosition() - currentPosition;
+
+                double power;
+                if (Math.abs(error) < 100) {  // If close to target
+                    power = 0.2;  // Low power to minimize overshoot
+                } else {
+                    power = 1;  // Regular power for faster movement
+                }
+
+                armMotor.setPower(power);
+
+                // If the arm has reached its target, reset the flag and stop the motor
+                if (!armMotor.isBusy()) {
+                    isArmInPresetPosition = false;
+                    armMotor.setPower(0);  // Stop the motor when it reaches the position
+                    armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // Switch back to manual control
+                }
+            }
+
+            // Allow fine-tuning adjustments with the left stick if no preset position is being targeted
+            if (!isArmInPresetPosition) {
+                double armManualInput = -gamepad2.left_stick_y;  // Fine-tuning adjustments
+                armMotor.setPower(armManualInput * 0.2);  // Scale power for finer control
+            }
+
+            // Viper Slide Control
+            if (gamepad2.a) {
+                // Retract slide
+                viperMotor.setTargetPosition(VIPER_REST);
+                viperMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                viperMotor.setPower(1.0); // Set power as needed
+            } else if (gamepad2.b) {
+                // Extend slide
+                viperMotor.setTargetPosition(VIPER_MAX_EXTENSION);
+                viperMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                viperMotor.setPower(1.0); // Set power as needed
+            }
+
+            // Servo controls for pivoting and gripping mechanism
+            if (gamepad2.left_bumper) {
+                servoPivot.setPower(-1.0);    // Move pivot in one direction
+            } else if (gamepad2.right_bumper) {
+                servoPivot.setPower(1.0);     // Move pivot in the other direction
+            } else {
+                servoPivot.setPower(0.0);     // Stop the pivot servo
+            }
+
+            // Control the gripper servo with Gamepad 2 left and right triggers
+            if (gamepad2.left_trigger > 0.5) {
+                servoGripper.setPower(1.0);   // Close the gripper
+            } else if (gamepad2.right_trigger > 0.5) {
+                servoGripper.setPower(-1.0);  // Open the gripper
+            } else {
+                servoGripper.setPower(0.0);   // Stop the gripper servo
+            }
+
+            // Display telemetry data for debugging and status updates
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Front left/right power", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
+            telemetry.addData("Back left/right power", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+            telemetry.addData("Arm Position (ticks)", armMotor.getCurrentPosition());
+            telemetry.addData("Viper Slide Position (ticks)", viperMotor.getCurrentPosition());
             telemetry.update();
         }
     }
