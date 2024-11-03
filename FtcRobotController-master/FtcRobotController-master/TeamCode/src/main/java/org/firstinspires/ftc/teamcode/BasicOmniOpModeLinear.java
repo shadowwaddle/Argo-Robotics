@@ -94,9 +94,9 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
 
         // Constants for arm and viper positions
         int ARM_POSITION_REST = 0;         // 0 Degrees
-        int ARM_POSITION_DROP = -2272;     // Example for 100 degrees
+        int ARM_POSITION_DROP = -1800;     // THIS NUMBER IS RANDOM, TRIAL AND ERROR
         int VIPER_REST = 0;
-        int VIPER_MAX_EXTENSION = 1000;
+        int VIPER_MAX_EXTENSION = 0;   // PLEASE FIX THIS VALUE
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
