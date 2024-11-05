@@ -1,6 +1,5 @@
-Apologies for the incomplete code. Here’s the full version, with the calculateDecelerationPower method completed at the bottom to ensure the deceleration function is implemented correctly:
 
-        package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.robotcontroller.external.samples;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
