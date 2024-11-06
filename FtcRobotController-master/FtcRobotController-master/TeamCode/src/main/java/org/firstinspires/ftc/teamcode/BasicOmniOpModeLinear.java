@@ -2,6 +2,7 @@
 package org.firstinspires.ftc.robotcontroller.external.samples;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomn.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -33,15 +34,13 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
 
     // Constants for ticks per degree and mm
     final double ARM_TICKS_PER_DEGREE = 28 * (250047.0 / 4913.0) * (42.0 / 10.0) / 360.0;
-    final double VIPER_TICKS_PER_MM = (111132.0 / 289.0) / 120.0;
     final double ARM_COMPENSATION_THRESHOLD = 45 * ARM_TICKS_PER_DEGREE;
 
     // Positions
     final double ARM_COLLAPSED_POSITION = 0 * ARM_TICKS_PER_DEGREE;
     final double ARM_INTAKE_POSITION = 10 * ARM_TICKS_PER_DEGREE;
     final double ARM_HIGH_BASKET_POSITION = 100 * ARM_TICKS_PER_DEGREE;
-    final double VIPER_COLLAPSED = 0 * VIPER_TICKS_PER_MM;
-    final double VIPER_INTAKE = 40 * VIPER_TICKS_PER_MM;
+    final double VIPER_MAX_TICKS = 580;
 
     double armPosition = ARM_COLLAPSED_POSITION;
     double viperPosition = VIPER_COLLAPSED;
@@ -51,8 +50,11 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
 
     // State flags
     private boolean isArmInPresetPosition = false;
-    private boolean isViperInPresetPosition = false;
 
+    double cycletime = 0;
+    double looptime = 0;
+    double oldtime = 0;
+    
     @Override
     public void runOpMode() {
 
@@ -127,14 +129,10 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
             // Player 2 Controls (Arm & Viper)
             if (gamepad2.a) { // Set to intake position
                 armPosition = ARM_INTAKE_POSITION;
-                viperPosition = VIPER_INTAKE;
                 isArmInPresetPosition = true;
-                isViperInPresetPosition = true;
             } else if (gamepad2.y) { // Set to high basket position
                 armPosition = ARM_HIGH_BASKET_POSITION;
-                viperPosition = VIPER_COLLAPSED;
                 isArmInPresetPosition = true;
-                isViperInPresetPosition = true;
             }
 
             // Apply gravity compensation based on viper extension
@@ -162,19 +160,33 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
             }
 
             // Control viper with fine-tuning if not in preset position
-            if (isViperInPresetPosition) {
-                viperMotor.setTargetPosition((int) viperPosition);
-                viperMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                viperMotor.setPower(1.0);
-                if (!viperMotor.isBusy()) {
-                    isViperInPresetPosition = false;
-                    viperMotor.setPower(0.0);
-                    viperMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                }
-            } else {
-                double viperManualInput = gamepad2.right_stick_y;
-                viperMotor.setPower(viperManualInput * 0.2);
+             if (gamepad2.right_bumper){
+                viperPosition += 2800 * cycletime;
             }
+            else if (gamepad2.left_bumper){
+                viperPosition -= 2800 * cycletime;
+            }
+            /*here we check to see if the lift is trying to go higher than the maximum extension.
+           *if it is, we set the variable to the max.
+            */
+            if (viperPosition > VIPER_MAX_TICKS){
+                   liftPosition = LIFT_SCORING_IN_HIGH_BASKET;
+            }
+            //same as above, we see if the lift is trying to go below 0, and if it is, we set it to 0.
+           if (viperPosition < 0){
+                   viperPosition = 0;
+            }
+
+           viperMotor.setTargetPosition((int) (viperPosition));
+
+           ((DcMotorEx) liftMotor).setVelocity(2100);
+           viperMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            
+            looptime = getRuntime();
+            cycletime = looptime-oldtime;
+            oldtime = looptime;
+
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/right power", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
