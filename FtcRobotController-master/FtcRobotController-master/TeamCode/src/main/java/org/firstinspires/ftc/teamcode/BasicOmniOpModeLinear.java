@@ -2,7 +2,7 @@
 package org.firstinspires.ftc.robotcontroller.external.samples;
 
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomn.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -43,7 +43,7 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
     final double VIPER_MAX_TICKS = 580;
 
     double armPosition = ARM_COLLAPSED_POSITION;
-    double viperPosition = VIPER_COLLAPSED;
+    double viperPosition = 0;
 
     // Gravity compensation factor
     double armLiftComp = 0;
@@ -65,7 +65,7 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
         rightBackDrive = hardwareMap.get(DcMotorEx.class, "rightBackDrive");
         armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
         viperMotor = hardwareMap.get(DcMotorEx.class, "viperMotor");
-        servoPivot = hardwareMap.get(CRServo.class, "servoPivot");
+        servoPivot = hardwareMap.get(Servo.class, "servoPivot");
         servoGripper = hardwareMap.get(CRServo.class, "servoGripper");
 
         // Set motor directions
@@ -160,33 +160,23 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
             }
 
             // Control viper with fine-tuning if not in preset position
-             if (gamepad2.right_bumper){
+            if (gamepad2.right_bumper) {
                 viperPosition += 2800 * cycletime;
-            }
-            else if (gamepad2.left_bumper){
+            } else if (gamepad2.left_bumper) {
                 viperPosition -= 2800 * cycletime;
             }
-            /*here we check to see if the lift is trying to go higher than the maximum extension.
-           *if it is, we set the variable to the max.
-            */
-            if (viperPosition > VIPER_MAX_TICKS){
-                   liftPosition = LIFT_SCORING_IN_HIGH_BASKET;
-            }
-            //same as above, we see if the lift is trying to go below 0, and if it is, we set it to 0.
-           if (viperPosition < 0){
-                   viperPosition = 0;
+            if (viperPosition > VIPER_MAX_TICKS) {
+                viperPosition = VIPER_MAX_TICKS;
+            } else if (viperPosition < 0) {
+                viperPosition = 0;
             }
 
-           viperMotor.setTargetPosition((int) (viperPosition));
+            viperMotor.setTargetPosition((int) viperPosition);
+            viperMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-           ((DcMotorEx) liftMotor).setVelocity(2100);
-           viperMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            
             looptime = getRuntime();
-            cycletime = looptime-oldtime;
+            cycletime = looptime - oldtime;
             oldtime = looptime;
-
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/right power", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
@@ -196,7 +186,6 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
             telemetry.update();
         }
     }
-
     /**
      * Calculates deceleration power for the arm as it approaches the target position.
      */
