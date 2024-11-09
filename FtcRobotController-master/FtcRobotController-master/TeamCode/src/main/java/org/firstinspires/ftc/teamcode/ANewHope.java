@@ -155,7 +155,7 @@ public class Ri3d extends LinearOpMode {
         rightBackDrive  = hardwareMap.dcMotor.get("rightBackDrive");
         liftMotor       = hardwareMap.dcMotor.get("viperMotor");
         armMotor        = hardwareMap.get(DcMotor.class, "armMotor"); //the arm motor
-        //hangMotor       = hardwareMap.dcMotor.get("hangMotor");
+        //hangMotor      = hardwareMap.dcMotor.get("hangMotor");
 
 
        /*
@@ -288,7 +288,13 @@ public class Ri3d extends LinearOpMode {
             than the other, it "wins out". This variable is then multiplied by our FUDGE_FACTOR.
             The FUDGE_FACTOR is the number of degrees that we can adjust the arm by with this function. */
 
-            armPositionFudgeFactor = FUDGE_FACTOR * (gamepad2.right_trigger + (-gamepad2.left_trigger));
+            if (gamepad2.left_bumper) {
+                armPositionFudgeFactor = FUDGE_FACTOR * -1;
+
+            }
+            if (gamepad2.right_bumper) {
+            armPositionFudgeFactor = FUDGE_FACTOR;
+            }
 
 
             /* Here we implement a set of if else statements to set our arm to different scoring positions.
@@ -405,10 +411,10 @@ public class Ri3d extends LinearOpMode {
             liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
             // Increment or decrement the lift position based on button press
-            if (gamepad2.right_bumper) {
-                liftPosition += 50; // Extend lift when right bumper is pressed
-            } else if (gamepad2.left_bumper) {
-                liftPosition -= 50; // Retract lift when left bumper is pressed
+            if (gamepad2.right_trigger > 0) {
+                liftPosition = liftPosition + (50 * gamepad2.right_trigger); // Extend lift when right trigger is pressed
+            } else if (gamepad2.left_trigger > 0) {
+                liftPosition = liftPosition - (50 * gamepad2.left_trigger); // Retract lift when left trigger is pressed
             }
 
             // Enforce boundaries to prevent lift from going out of range
