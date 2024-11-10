@@ -125,11 +125,12 @@ public class Ri3d extends LinearOpMode {
     double armPosition = (int)ARM_COLLAPSED_INTO_ROBOT;
     double armPositionFudgeFactor;
 
-    //final double LIFT_TICKS_PER_MM = (111132.0 / 289.0) / 120.0;
+    final double LIFT_TICKS_PER_MM = (111132.0 / 289.0) / 120.0;
 
-    final double LIFT_COLLAPSED = 0;
-    final double LIFT_SCORING_IN_LOW_BASKET = 0;
-    final double LIFT_SCORING_IN_HIGH_BASKET = 580;
+    final double LIFT_COLLAPSED = 0 * LIFT_TICKS_PER_MM;
+    final double LIFT_SCORING_IN_LOW_BASKET = 0 * LIFT_TICKS_PER_MM;
+    final double LIFT_SCORING_IN_HIGH_BASKET = 480 * LIFT_TICKS_PER_MM;
+
 
     double liftPosition = LIFT_COLLAPSED;
 
