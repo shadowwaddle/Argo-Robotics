@@ -1,33 +1,6 @@
-/* Copyright (c) 2021 FIRST. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided that
- * the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this list
- * of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice, this
- * list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * Neither the name of FIRST nor the names of its contributors may be used to endorse or
- * promote products derived from this software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
- * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+Apologies for the incomplete code. Here’s the full version, with the calculateDecelerationPower method completed at the bottom to ensure the deceleration function is implemented correctly:
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
+        package org.firstinspires.ftc.robotcontroller.external.samples;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -51,31 +24,52 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
     // Additional motors and servos
     private DcMotorEx armMotor = null;
     private DcMotorEx viperMotor = null;
-    private CRServo servoPivot = null;
+    private Servo servoPivot = null;
     private CRServo servoGripper = null;
 
-    // Flag to check if arm is moving to a preset position
+    // Constants for deceleration
+    private static final double SLOWDOWN_THRESHOLD = 300; // Distance in ticks to start slowing down
+    private static final double MIN_POWER = 0.2; // Minimum power when close to target
+    private static final double FULL_POWER = 1.0; // Full power for normal movement
+
+    // Constants for ticks per degree and mm
+    final double ARM_TICKS_PER_DEGREE = 28 * (250047.0 / 4913.0) * (42.0 / 10.0) / 360.0;
+    final double VIPER_TICKS_PER_MM = (111132.0 / 289.0) / 120.0;
+    final double ARM_COMPENSATION_THRESHOLD = 45 * ARM_TICKS_PER_DEGREE;
+
+    // Positions
+    final double ARM_COLLAPSED_POSITION = 0 * ARM_TICKS_PER_DEGREE;
+    final double ARM_INTAKE_POSITION = 10 * ARM_TICKS_PER_DEGREE;
+    final double ARM_HIGH_BASKET_POSITION = 100 * ARM_TICKS_PER_DEGREE;
+    final double VIPER_COLLAPSED = 0 * VIPER_TICKS_PER_MM;
+    final double VIPER_INTAKE = 40 * VIPER_TICKS_PER_MM;
+
+    double armPosition = ARM_COLLAPSED_POSITION;
+    double viperPosition = VIPER_COLLAPSED;
+
+    // Gravity compensation factor
+    double armLiftComp = 0;
+
+    // State flags
     private boolean isArmInPresetPosition = false;
+    private boolean isViperInPresetPosition = false;
 
     @Override
     public void runOpMode() {
 
-        // Initialize the hardware variables with names that match the robot configuration
+        // Initialize hardware
         leftFrontDrive = hardwareMap.get(DcMotorEx.class, "leftFrontDrive");
         leftBackDrive = hardwareMap.get(DcMotorEx.class, "leftBackDrive");
         rightFrontDrive = hardwareMap.get(DcMotorEx.class, "rightFrontDrive");
         rightBackDrive = hardwareMap.get(DcMotorEx.class, "rightBackDrive");
-
         armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
         viperMotor = hardwareMap.get(DcMotorEx.class, "viperMotor");
         servoPivot = hardwareMap.get(CRServo.class, "servoPivot");
         servoGripper = hardwareMap.get(CRServo.class, "servoGripper");
 
-        // Reverse direction for left motors to ensure correct movement
+        // Set motor directions
         leftFrontDrive.setDirection(DcMotorEx.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotorEx.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotorEx.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotorEx.Direction.FORWARD);
 
         // Set ZeroPowerBehavior to BRAKE for all drivetrain motors
         leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -83,43 +77,29 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-
         // Encoder initialization for armMotor and viperMotor
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         viperMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        // Set motors to run using encoders
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         viperMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        // Constants for arm and viper positions
-        int ARM_POSITION_REST = 0;         // 0 Degrees
-        int ARM_POSITION_DROP = -1800;     // THIS NUMBER IS RANDOM, TRIAL AND ERROR
-        int VIPER_REST = 0;
-        int VIPER_MAX_EXTENSION = 0;   // PLEASE FIX THIS VALUE
-
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
-        // Wait for the game to start (driver presses START)
         waitForStart();
         runtime.reset();
 
-        // Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            // Player 1 Controls (Chassis)
-            double axial = -gamepad1.left_stick_y;     // Forward and backward
-            double lateral = gamepad1.left_stick_x;    // Strafing left and right
-            double yaw = gamepad1.right_stick_x;       // Rotation
+            // Player 1 Controls (Chassis & Gripper)
+            double axial = -gamepad1.left_stick_y;
+            double lateral = gamepad1.left_stick_x;
+            double yaw = gamepad1.right_stick_x;
 
-            // Calculate power for each wheel based on movement control inputs
             double leftFrontPower = axial + lateral + yaw;
             double rightFrontPower = axial - lateral - yaw;
             double leftBackPower = axial - lateral + yaw;
             double rightBackPower = axial + lateral - yaw;
 
-            // Normalize the power values to ensure none exceed 100%
             double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
             max = Math.max(max, Math.abs(leftBackPower));
             max = Math.max(max, Math.abs(rightBackPower));
@@ -131,78 +111,94 @@ public class BasicOmniOpModeLinear extends LinearOpMode {
                 rightBackPower /= max;
             }
 
-            // Set calculated power to each wheel motor
             leftFrontDrive.setPower(leftFrontPower);
             rightFrontDrive.setPower(rightFrontPower);
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
-            // Arm Control with preset positions
-            if (gamepad2.x && !isArmInPresetPosition) {
-                // Move to drop position
-                armMotor.setTargetPosition(ARM_POSITION_DROP);
-                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armMotor.setPower(1); // Adjust power as needed
+            // Gripper
+            if (gamepad1.left_bumper) {
+                servoGripper.setPower(-1.0); // Collect
+            } else if (gamepad1.right_bumper) {
+                servoGripper.setPower(0.0); // Off
+            } else if (gamepad1.y) {
+                servoGripper.setPower(0.5); // Deposit
+            }
+
+            // Player 2 Controls (Arm & Viper)
+            if (gamepad2.a) { // Set to intake position
+                armPosition = ARM_INTAKE_POSITION;
+                viperPosition = VIPER_INTAKE;
                 isArmInPresetPosition = true;
-            } else if (gamepad2.y && !isArmInPresetPosition) {
-                // Move to rest position
-                armMotor.setTargetPosition(ARM_POSITION_REST);
-                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armMotor.setPower(1); // Adjust power as needed
+                isViperInPresetPosition = true;
+            } else if (gamepad2.y) { // Set to high basket position
+                armPosition = ARM_HIGH_BASKET_POSITION;
+                viperPosition = VIPER_COLLAPSED;
                 isArmInPresetPosition = true;
+                isViperInPresetPosition = true;
             }
 
-            // If the arm has reached its target, reset the flag and stop the motor
-            if (!armMotor.isBusy() && isArmInPresetPosition) {
-                isArmInPresetPosition = false;
-                armMotor.setPower(0);  // Stop the motor when it reaches the position
-                armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // Switch back to manual control
-            }
-
-            // Allow fine-tuning adjustments with the left stick if no preset position is being targeted
-            if (!isArmInPresetPosition) {
-                double armManualInput = -gamepad2.left_stick_y;  // Fine-tuning adjustments
-                armMotor.setPower(armManualInput * 0.1);  // Scale power for finer control
-            }
-
-            // Viper Slide Control
-            if (gamepad2.a) {
-                // Retract slide
-                viperMotor.setTargetPosition(VIPER_REST);
-                viperMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                viperMotor.setPower(1.0); // Set power as needed
-            } else if (gamepad2.b) {
-                // Extend slide
-                viperMotor.setTargetPosition(VIPER_MAX_EXTENSION);
-                viperMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                viperMotor.setPower(1.0); // Set power as needed
-            }
-
-            // Servo controls for pivoting and gripping mechanism
-            if (gamepad2.left_bumper) {
-                servoPivot.setPower(-1.0);    // Move pivot in one direction
-            } else if (gamepad2.right_bumper) {
-                servoPivot.setPower(1.0);     // Move pivot in the other direction
+            // Apply gravity compensation based on viper extension
+            if (armPosition < ARM_COMPENSATION_THRESHOLD) {
+                armLiftComp = 0.25568 * viperPosition;
             } else {
-                servoPivot.setPower(0.0);     // Stop the pivot servo
+                armLiftComp = 0;
             }
 
-            // Control the gripper servo with Gamepad 2 left and right triggers
-            if (gamepad2.left_trigger > 0.5) {
-                servoGripper.setPower(1.0);   // Close the gripper
-            } else if (gamepad2.right_trigger > 0.5) {
-                servoGripper.setPower(-1.0);  // Open the gripper
+            // Control arm with deceleration near endpoints
+            if (isArmInPresetPosition) {
+                double armPower = calculateDecelerationPower(armMotor.getCurrentPosition(), armPosition);
+                armMotor.setTargetPosition((int) (armPosition + armLiftComp));
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setPower(armPower);
+
+                if (!armMotor.isBusy()) {
+                    isArmInPresetPosition = false;
+                    armMotor.setPower(0.0);
+                    armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                }
             } else {
-                servoGripper.setPower(0.0);   // Stop the gripper servo
+                double armManualInput = -gamepad2.left_stick_y;
+                armMotor.setPower(armManualInput * 0.2);
             }
 
-            // Display telemetry data for debugging and status updates
+            // Control viper with fine-tuning if not in preset position
+            if (isViperInPresetPosition) {
+                viperMotor.setTargetPosition((int) viperPosition);
+                viperMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                viperMotor.setPower(1.0);
+                if (!viperMotor.isBusy()) {
+                    isViperInPresetPosition = false;
+                    viperMotor.setPower(0.0);
+                    viperMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                }
+            } else {
+                double viperManualInput = gamepad2.right_stick_y;
+                viperMotor.setPower(viperManualInput * 0.2);
+            }
+
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/right power", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back left/right power", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.addData("Arm Position (ticks)", armMotor.getCurrentPosition());
-            telemetry.addData("Viper Slide Position (ticks)", viperMotor.getCurrentPosition());
+            telemetry.addData("Viper Position (ticks)", viperMotor.getCurrentPosition());
             telemetry.update();
+        }
+    }
+
+    /**
+     * Calculates deceleration power for the arm as it approaches the target position.
+     */
+    private double calculateDecelerationPower(int currentPosition, double targetPosition) {
+        double distanceToTarget = Math.abs(targetPosition - currentPosition);
+
+        if (distanceToTarget < SLOWDOWN_THRESHOLD) {
+            // Scale power based on how close we are to the target
+            double power = MIN_POWER + (FULL_POWER - MIN_POWER) * (distanceToTarget / SLOWDOWN_THRESHOLD);
+            return Math.max(MIN_POWER, power); // Ensure power doesn’t drop below MIN_POWER
+        } else {
+            // Use full power when not near the target
+            return FULL_POWER;
         }
     }
 }
