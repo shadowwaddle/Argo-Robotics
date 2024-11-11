@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name  = "Basic: No Linear Acuator Movement Test",
+@TeleOp(name  = "Basic: Linear Actuator Movement Test",
         group = "Linear OpMode")
 
 public class LinearAcuator extends LinearOpMode {
