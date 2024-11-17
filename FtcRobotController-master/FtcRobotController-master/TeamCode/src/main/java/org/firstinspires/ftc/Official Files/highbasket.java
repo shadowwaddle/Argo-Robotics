@@ -36,7 +36,7 @@ public class AutonTest2 extends LinearOpMode {
     final double ARM_COLLECT = 6 * ARM_TICKS_PER_DEGREE;
     final double ARM_START = 20 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SPECIMEN = 90 * ARM_TICKS_PER_DEGREE;
-    final double ARM_HIGH_BASKET = 100 * ARM_TICKS_PER_DEGREE;
+    final double ARM_HIGH_BASKET = 95 * ARM_TICKS_PER_DEGREE;
 
     // Wrist Constants
     final double WRIST_FOLDED_IN = 1.0;
@@ -65,10 +65,17 @@ public class AutonTest2 extends LinearOpMode {
         // Initial setup: arm to collect, lift to intake
         setArmAndLiftToStart();
 
-        // Autonomous sequence example
-        setArmToDrop();
+        strafeLeft(10, 0.5);
+        setArmToDrop(); 
         moveForward(20, 0.5);
-        sleep(10000);
+        turnLeft(95, 0.5);
+        moveForward(6, 0.5);
+        intake.setPower(-1);
+        sleep(3000);
+        moveBackward(10, 0.5);
+        sleep(1000);
+        setArmAndLiftToStart();
+        sleep(1000);
         
     }
 
@@ -115,6 +122,32 @@ public class AutonTest2 extends LinearOpMode {
 
     private void moveBackward(double inches, double speed) {
         moveForward(-inches, speed);
+    }
+    
+    private void strafeLeft(double inches, double speed) {
+        int ticks = (int) (inches * TICKS_PER_INCH);
+
+        setTargetPosition(leftFront, -ticks);
+        setTargetPosition(leftRear, ticks);
+        setTargetPosition(rightFront, ticks);
+        setTargetPosition(rightRear, -ticks);
+
+        setMotorPowers(speed);
+        waitForMotors();
+        delayAfterMovement();
+    }
+
+    private void strafeRight(double inches, double speed) {
+        int ticks = (int) (inches * TICKS_PER_INCH);
+
+        setTargetPosition(leftFront, ticks);
+        setTargetPosition(leftRear, -ticks);
+        setTargetPosition(rightFront, -ticks);
+        setTargetPosition(rightRear, ticks);
+
+        setMotorPowers(speed);
+        waitForMotors();
+        delayAfterMovement();
     }
 
     private void turnLeft(double degrees, double speed) {
