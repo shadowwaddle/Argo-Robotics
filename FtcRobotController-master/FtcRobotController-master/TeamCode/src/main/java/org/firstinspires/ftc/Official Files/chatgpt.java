@@ -1,8 +1,8 @@
 
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -11,58 +11,50 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-@TeleOp(name="A New Hope", group="Linear OpMode")
-public class Ri3d extends LinearOpMode {
+@TeleOp(name = "A New Hope", group = "Linear OpMode")
+public class ANewHope extends LinearOpMode {
 
-    public DcMotor leftFrontDrive = null;
-    public DcMotor rightFrontDrive = null;
-    public DcMotor leftBackDrive = null;
-    public DcMotor rightBackDrive = null;
-    public DcMotor armMotor = null;
-    public DcMotor liftMotor = null;
-    public CRServo intake = null;
-    public Servo wrist = null;
+    // Hardware
+    private DcMotor leftFrontDrive = null;
+    private DcMotor rightFrontDrive = null;
+    private DcMotor leftBackDrive = null;
+    private DcMotor rightBackDrive = null;
+    private DcMotorEx armMotor = null;
+    private DcMotorEx liftMotor = null;
+    private CRServo intake = null;
+    private Servo wrist = null;
 
-    final double ARM_TICKS_PER_DEGREE = 28 * 250047.0 / 4913.0 * 42.0 / 10.0 / 360.0;
-    final double ARM_COLLAPSED_INTO_ROBOT  = 0;
-    final double ARM_COLLECT               = 10 * ARM_TICKS_PER_DEGREE;
-    final double ARM_CLEAR_BARRIER         = 15 * ARM_TICKS_PER_DEGREE;
-    final double ARM_SCORE_SPECIMEN        = 90 * ARM_TICKS_PER_DEGREE;
-    final double ARM_ATTACH_HANGING_HOOK   = 110 * ARM_TICKS_PER_DEGREE;
-    final double ARM_WINCH_ROBOT           = 10  * ARM_TICKS_PER_DEGREE;
+    // Constants
+    private static final double ARM_TICKS_PER_DEGREE = 28 * 250047.0 / 4913.0 * 42.0 / 10.0 / 360.0;
+    private static final double ARM_COLLAPSED_INTO_ROBOT = 0;
+    private static final double ARM_COLLECT = 10 * ARM_TICKS_PER_DEGREE;
+    private static final double ARM_SCORE_SPECIMEN = 90 * ARM_TICKS_PER_DEGREE;
 
-    final double INTAKE_COLLECT = 1.5; // Increased intake speed
-    final double INTAKE_OFF = 0.0;
-    final double INTAKE_DEPOSIT = -0.5;
+    private static final double INTAKE_COLLECT = 1.5;
+    private static final double INTAKE_OFF = 0.0;
+    private static final double INTAKE_DEPOSIT = -0.5;
 
-    final double WRIST_FOLDED_IN = 1.0;
-    final double WRIST_FOLDED_OUT = 0.7;
+    private static final double WRIST_FOLDED_IN = 1.0;
+    private static final double WRIST_FOLDED_OUT = 0.7;
 
-    final double LIFT_TICKS_PER_MM = (111132.0 / 289.0) / 120.0;
-    final double LIFT_COLLAPSED = 0 * LIFT_TICKS_PER_MM;
-    final double LIFT_START = 50 * LIFT_TICKS_PER_MM;
-    final double LIFT_INTAKE = 400 * LIFT_TICKS_PER_MM;
-    final double LIFT_SCORING_IN_HIGH_BASKET = 500 * LIFT_TICKS_PER_MM;
+    private static final double LIFT_TICKS_PER_MM = (111132.0 / 289.0) / 120.0;
+    private static final double LIFT_COLLAPSED = 0 * LIFT_TICKS_PER_MM;
+    private static final double LIFT_SCORING_IN_HIGH_BASKET = 500 * LIFT_TICKS_PER_MM;
 
-    // Arm Deceleration Constants
-    final double ARM_DECELERATION_THRESHOLD = 400; // Distance (ticks) to start decelerating
-    final double ARM_MIN_VELOCITY = 200; // Minimum velocity (ticks/sec) near the target
-    final double ARM_MAX_VELOCITY = 2100; // Maximum velocity (ticks/sec)
+    // Deceleration Constants
+    private static final double ARM_DECELERATION_THRESHOLD = 400;
+    private static final double ARM_MIN_VELOCITY = 200;
+    private static final double ARM_MAX_VELOCITY = 2100;
 
-    final double ARM_JOINT_HEIGHT = 300; // Example: Height of arm joint from ground in mm
-    final double LIFT_LENGTH = 500; // Example: Length of lift extension in mm
-    final double GROUND_OFFSET = 50; // Example: Desired intake height from the ground in mm
+    private static final double LIFT_DECELERATION_THRESHOLD = 300;
+    private static final double LIFT_MIN_VELOCITY = 300;
+    private static final double LIFT_MAX_VELOCITY = 1000;
 
-    // Lift Deceleration Constants (if needed)
-    final double LIFT_DECELERATION_THRESHOLD = 300; // Distance (ticks) to start decelerating
-    final double LIFT_MIN_VELOCITY = 300; // Minimum velocity (ticks/sec) near the target
-    final double LIFT_MAX_VELOCITY = 1000; // Maximum velocity (ticks/sec)
-
-    double liftPosition = LIFT_START;
-    double armPosition = ARM_COLLECT;
-    boolean isIntaking = false;
+    // Variables
+    private double armPosition = ARM_COLLAPSED_INTO_ROBOT;
+    private double liftPosition = LIFT_COLLAPSED;
+    private boolean isIntaking = false;
 
     @Override
     public void runOpMode() {
@@ -71,6 +63,7 @@ public class Ri3d extends LinearOpMode {
         wrist.setPosition(WRIST_FOLDED_OUT);
         telemetry.addLine("Robot Ready.");
         telemetry.update();
+
         waitForStart();
 
         while (opModeIsActive()) {
@@ -87,8 +80,10 @@ public class Ri3d extends LinearOpMode {
         leftBackDrive = hardwareMap.get(DcMotor.class, "leftBackDrive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFrontDrive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightBackDrive");
-        liftMotor = hardwareMap.dcMotor.get("viperMotor");
-        armMotor = hardwareMap.get(DcMotor.class, "armMotor");
+        armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
+        liftMotor = hardwareMap.get(DcMotorEx.class, "viperMotor");
+        intake = hardwareMap.get(CRServo.class, "servoGripper");
+        wrist = hardwareMap.get(Servo.class, "servoPivot");
 
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -101,19 +96,8 @@ public class Ri3d extends LinearOpMode {
         rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        armMotor.setTargetPosition(0);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        intake = hardwareMap.get(CRServo.class, "servoGripper");
-        wrist = hardwareMap.get(Servo.class, "servoPivot");
-        intake.setPower(INTAKE_OFF);
-
-        IMU imu = hardwareMap.get(IMU.class, "imu");
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
-        imu.initialize(parameters);
     }
 
     private void controlChassis() {
@@ -148,7 +132,7 @@ public class Ri3d extends LinearOpMode {
             intake.setPower(INTAKE_COLLECT);
         } else if (gamepad1.right_bumper) {
             intake.setPower(INTAKE_DEPOSIT);
-        } else if (gamepad1.y) {
+        } else {
             intake.setPower(INTAKE_OFF);
         }
     }
@@ -162,24 +146,74 @@ public class Ri3d extends LinearOpMode {
     }
 
     private void controlArmAndLift() {
-        if (isIntaking) {
-            // Calculate arm position dynamically
-            double cosTheta = (ARM_JOINT_HEIGHT - GROUND_OFFSET) /
-                    (LIFT_LENGTH + liftPosition / LIFT_TICKS_PER_MM);
-            cosTheta = Math.max(-1.0, Math.min(1.0, cosTheta));
-            double angleRadians = Math.acos(cosTheta);
-            armPosition = Math.toDegrees(angleRadians) * ARM_TICKS_PER_DEGREE;
+        if (gamepad2.a) {
+            armPosition = ARM_COLLECT;
+            isIntaking = true;
+            wrist.setPosition(WRIST_FOLDED_OUT);
+            intake.setPower(INTAKE_COLLECT);
+        } else if (gamepad2.y) {
+            armPosition = ARM_SCORE_SPECIMEN;
+            isIntaking = false;
+            wrist.setPosition(WRIST_FOLDED_IN);
+        } else if (gamepad2.dpad_up) {
+            liftPosition = LIFT_SCORING_IN_HIGH_BASKET;
+        } else if (gamepad2.dpad_down) {
+            liftPosition = LIFT_COLLAPSED;
         }
+
+        enforceLiftBoundaries();
+        updateArmAndLift();
+    }
+
+    private void enforceLiftBoundaries() {
+        if (isIntaking) {
+            if (liftPosition > LIFT_SCORING_IN_HIGH_BASKET) {
+                liftPosition = LIFT_SCORING_IN_HIGH_BASKET;
+            }
+        } else {
+            if (liftPosition > LIFT_SCORING_IN_HIGH_BASKET) {
+                liftPosition = LIFT_SCORING_IN_HIGH_BASKET;
+            } else if (liftPosition < LIFT_COLLAPSED) {
+                liftPosition = LIFT_COLLAPSED;
+            }
+        }
+    }
+
+    private void updateArmAndLift() {
+        // Deceleration for Arm
+        double armVelocity = calculateDecelerationVelocity(
+            armMotor.getCurrentPosition(),
+            armPosition,
+            ARM_DECELERATION_THRESHOLD,
+            ARM_MIN_VELOCITY,
+            ARM_MAX_VELOCITY
+        );
 
         armMotor.setTargetPosition((int) armPosition);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armMotor.setPower(0.8);
+        armMotor.setVelocity(armVelocity);
+
+        // Deceleration for Lift
+        double liftVelocity = calculateDecelerationVelocity(
+            liftMotor.getCurrentPosition(),
+            liftPosition,
+            LIFT_DECELERATION_THRESHOLD,
+            LIFT_MIN_VELOCITY,
+            LIFT_MAX_VELOCITY
+        );
 
         liftMotor.setTargetPosition((int) liftPosition);
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        liftMotor.setPower(0.7);
+        liftMotor.setVelocity(liftVelocity);
+    }
 
-        telemetry.addData("Arm Position (ticks)", armPosition);
-        telemetry.addData("Lift Position (ticks)", liftPosition);
+    private double calculateDecelerationVelocity(double currentPosition, double targetPosition, double decelerationThreshold, double minVelocity, double maxVelocity) {
+        double distanceToTarget = Math.abs(targetPosition - currentPosition);
+        if (distanceToTarget < decelerationThreshold) {
+            return minVelocity + (maxVelocity - minVelocity) * (distanceToTarget / decelerationThreshold);
+        } else {
+            return maxVelocity;
+        }
     }
 }
+
