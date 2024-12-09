@@ -12,8 +12,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-@TeleOp(name="A New Hope", group="Linear OpMode")
-public class Ri3d extends LinearOpMode {
+@TeleOp(name="ANewHopePt2", group="Linear OpMode")
+public class ANewHopePt2 extends LinearOpMode {
 
     public DcMotor leftFrontDrive = null;
     public DcMotor rightFrontDrive = null;
@@ -38,12 +38,12 @@ public class Ri3d extends LinearOpMode {
     final double INTAKE_DEPOSIT = -0.5;
 
     final double WRIST_FOLDED_IN = 1.0;
-    final double WRIST_FOLDED_OUT = 0.7;
+    final double WRIST_FOLDED_OUT = 0.69;
 
     final double LIFT_TICKS_PER_MM = (111132.0 / 289.0) / 120.0;
     final double LIFT_COLLAPSED = 0 * LIFT_TICKS_PER_MM;
-    final double LIFT_START = 50 * LIFT_TICKS_PER_MM;
-    final double LIFT_INTAKE = 400 * LIFT_TICKS_PER_MM;
+    final double LIFT_START = 0 * LIFT_TICKS_PER_MM;
+    final double LIFT_INTAKE = 500 * LIFT_TICKS_PER_MM;
     final double LIFT_SCORING_IN_LOW_BASKET = 0 * LIFT_TICKS_PER_MM;
     final double LIFT_SCORING_IN_HIGH_BASKET = 500 * LIFT_TICKS_PER_MM;
 
@@ -51,7 +51,7 @@ public class Ri3d extends LinearOpMode {
     final double ARM_DECELERATION_THRESHOLD = 400; // Distance (ticks) to start decelerating
     final double ARM_MIN_VELOCITY = 200; // Minimum velocity (ticks/sec) near the target
     final double ARM_MAX_VELOCITY = 2100; // Maximum velocity (ticks/sec)
-    
+
     // Lift Deceleration Constants (if needed)
     final double LIFT_DECELERATION_THRESHOLD = 300; // Distance (ticks) to start decelerating
     final double LIFT_MIN_VELOCITY = 300; // Minimum velocity (ticks/sec) near the target
@@ -60,7 +60,7 @@ public class Ri3d extends LinearOpMode {
     // Calculates the deceleration velocity based on the distance to the target
     private double calculateDecelerationVelocity(double currentPosition, double targetPosition, double decelerationThreshold, double minVelocity, double maxVelocity) {
         double distanceToTarget = Math.abs(targetPosition - currentPosition);
-    
+
         if (distanceToTarget < decelerationThreshold) {
             // Scale velocity linearly as the motor approaches the target
             return minVelocity + (maxVelocity - minVelocity) * (distanceToTarget / decelerationThreshold);
@@ -69,11 +69,11 @@ public class Ri3d extends LinearOpMode {
             return maxVelocity;
         }
     }
-    
+
     double liftPosition = LIFT_START;
     double armPosition = ARM_COLLECT;
     boolean isIntaking = false;
-    
+
     @Override
     public void runOpMode() {
         leftFrontDrive = hardwareMap.get(DcMotor.class, "leftFrontDrive");
@@ -110,7 +110,7 @@ public class Ri3d extends LinearOpMode {
 
         telemetry.addLine("Robot Ready.");
         telemetry.update();
-        
+
         wrist.setPosition(WRIST_FOLDED_OUT);
 
 
@@ -191,23 +191,23 @@ public class Ri3d extends LinearOpMode {
                 armPosition = ARM_WINCH_ROBOT;
                 intake.setPower(INTAKE_OFF);
                 wrist.setPosition(WRIST_FOLDED_IN);
-        }
+            }
 
             // Fine Adjustments for Arm Position using Left Stick Y on gamepad2
             armPosition += gamepad2.left_stick_y * 10; // Adjust the value to control the sensitivity
 
             // Arm Deceleration Logic
-        double armVelocity = calculateDecelerationVelocity(
-            armMotor.getCurrentPosition(), // Current position of the arm motor
-            armPosition,                  // Target position for the arm
-            ARM_DECELERATION_THRESHOLD,   // Deceleration threshold
-            ARM_MIN_VELOCITY,             // Minimum velocity near target
-            ARM_MAX_VELOCITY              // Maximum velocity
-        );
+            double armVelocity = calculateDecelerationVelocity(
+                    armMotor.getCurrentPosition(), // Current position of the arm motor
+                    armPosition,                  // Target position for the arm
+                    ARM_DECELERATION_THRESHOLD,   // Deceleration threshold
+                    ARM_MIN_VELOCITY,             // Minimum velocity near target
+                    ARM_MAX_VELOCITY              // Maximum velocity
+            );
 
-        armMotor.setTargetPosition((int) armPosition);
-        ((DcMotorEx) armMotor).setVelocity(armVelocity); // Set velocity dynamically
-        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            armMotor.setTargetPosition((int) armPosition);
+            ((DcMotorEx) armMotor).setVelocity(armVelocity); // Set velocity dynamically
+            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // Lift Control with Trigger Adjustments
             if (gamepad2.right_trigger > 0) {
