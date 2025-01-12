@@ -11,41 +11,46 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import java.lang.Math;
 
 @TeleOp(name="A New Hope", group="Linear OpMode")
-public class Ri3d extends LinearOpMode {
+public class ANewHope extends LinearOpMode {
 
-    public DcMotor leftFrontDrive = null;
+    public DcMotor leftFrontDrive  = null;
     public DcMotor rightFrontDrive = null;
-    public DcMotor leftBackDrive = null;
-    public DcMotor rightBackDrive = null;
-    public DcMotor armMotor = null;
-    public DcMotor liftMotor = null;
-    public CRServo intake = null;
-    public Servo wrist = null;
+    public DcMotor leftBackDrive   = null;
+    public DcMotor rightBackDrive  = null;
+    public DcMotor armMotor        = null;
+    public DcMotor liftMotor       = null;
+    public CRServo intake          = null;
+    public Servo   wrist           = null;
 
-    final double ARM_TICKS_PER_DEGREE = 28 * 250047.0 / 4913.0 * 42.0 / 10.0 / 360.0;
+    final double ARM_TICKS_PER_DEGREE      = 28 * 250047.0 / 4913.0 * 42.0 / 10.0 / 360.0;
+    final double DISTANCE_OFF_GROUND_MM    = 25.4;
+    final double ARM_JOINT_HEIGHT          = 340.36;
     final double ARM_COLLAPSED_INTO_ROBOT  = 0;
-     final double ARM_COLLECT               = 10 * ARM_TICKS_PER_DEGREE;
-     final double ARM_CLEAR_BARRIER         = 15 * ARM_TICKS_PER_DEGREE;
-     final double ARM_SCORE_SPECIMEN        = 90 * ARM_TICKS_PER_DEGREE;
-     final double ARM_SCORE_SAMPLE_IN_LOW   = 90 * ARM_TICKS_PER_DEGREE;
-     final double ARM_ATTACH_HANGING_HOOK   = 110 * ARM_TICKS_PER_DEGREE;
-     final double ARM_WINCH_ROBOT           = 10  * ARM_TICKS_PER_DEGREE;
+    final double ARM_COLLECT               = 10 * ARM_TICKS_PER_DEGREE;
+    final double ARM_CLEAR_BARRIER         = 15 * ARM_TICKS_PER_DEGREE;
+    final double ARM_SCORE_SPECIMEN        = 90 * ARM_TICKS_PER_DEGREE;
+    final double ARM_SCORE_SAMPLE_IN_LOW   = 90 * ARM_TICKS_PER_DEGREE;
+    final double ARM_ATTACH_HANGING_HOOK   = 110 * ARM_TICKS_PER_DEGREE;
+    final double ARM_WINCH_ROBOT           = 10  * ARM_TICKS_PER_DEGREE;
+    final double ARM_EXIT_ANGLE            = 30 * ARM_TICKS_PER_DEGREE;
 
-    final double INTAKE_COLLECT = 1.5; // Increased intake speed
-    final double INTAKE_OFF = 0.0;
+    final double INTAKE_COLLECT =  1.5; // Increased intake speed
+    final double INTAKE_OFF     =  0.0;
     final double INTAKE_DEPOSIT = -0.5;
 
-    final double WRIST_FOLDED_IN = 1.0;
-    final double WRIST_FOLDED_OUT = 0.7;
+    final double WRIST_FOLDED_IN   = 1.0;
+    final double WRIST_FOLDED_OUT  = 0.7;
 
     final double LIFT_TICKS_PER_MM = (111132.0 / 289.0) / 120.0;
-    final double LIFT_COLLAPSED = 0 * LIFT_TICKS_PER_MM;
-    final double LIFT_START = 50 * LIFT_TICKS_PER_MM;
-    final double LIFT_INTAKE = 400 * LIFT_TICKS_PER_MM;
-    final double LIFT_SCORING_IN_LOW_BASKET = 0 * LIFT_TICKS_PER_MM;
+    final double LIFT_COLLAPSED    = 0 * LIFT_TICKS_PER_MM;
+    final double LIFT_START        = 50 * LIFT_TICKS_PER_MM;
+    final double LIFT_INTAKE       = 400 * LIFT_TICKS_PER_MM;
+    final double LIFT_SCORING_IN_LOW_BASKET  = 0 * LIFT_TICKS_PER_MM;
     final double LIFT_SCORING_IN_HIGH_BASKET = 500 * LIFT_TICKS_PER_MM;
+    final double LIFT_LENGTH       = 482.6;
 
     double liftPosition = LIFT_START;
     double armPosition = ARM_COLLAPSED_INTO_ROBOT;
@@ -166,7 +171,10 @@ public class Ri3d extends LinearOpMode {
                 armPosition = ARM_WINCH_ROBOT;
                 intake.setPower(INTAKE_OFF);
                 wrist.setPosition(WRIST_FOLDED_IN);
-        }
+            } else if(gamepad2.a) {
+                isIntaking = false;
+                armPosition = ARM_EXIT_ANGLE;
+            }
 
             // Fine Adjustments for Arm Position using Left Stick Y on gamepad2
             armPosition += gamepad2.left_stick_y * 10; // Adjust the value to control the sensitivity
@@ -197,8 +205,11 @@ public class Ri3d extends LinearOpMode {
                     liftPosition = LIFT_START;
                 }
             }
+            armPosition = Math.acos( (ARM_JOINT_HEIGHT - DISTANCE_OFF_GROUND_MM) /
+                                     (LIFT_LENGTH + liftPosition / LIFT_TICKS_PER_MM));
 
             liftMotor.setTargetPosition((int) liftPosition);
+            armMotor.setTargetPosition((int) armPosition);
             liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             liftMotor.setPower(0.7);
 

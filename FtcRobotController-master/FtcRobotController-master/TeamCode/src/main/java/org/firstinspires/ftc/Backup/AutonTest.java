@@ -7,11 +7,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name="AutonTest2", group="Autonomous")
-public class AutonTest2 extends LinearOpMode {
+@Autonomous(name="AutonBase", group="Autonomous")
+public class AutonBase extends LinearOpMode {
 
     private DcMotor leftFront;
     private DcMotor leftRear;
@@ -23,7 +21,7 @@ public class AutonTest2 extends LinearOpMode {
     private Servo wrist;
     private DistanceSensor distanceSensor;
 
-    // Constants
+    // Movement Constants
     private static final double TICKS_PER_REVOLUTION = 537.6;
     private static final double WHEEL_DIAMETER_INCHES = 3.77;
     private static final double ROBOT_DIAMETER_INCHES = 16.0;
@@ -32,27 +30,34 @@ public class AutonTest2 extends LinearOpMode {
     private static final double TICKS_PER_DEGREE = (ROBOT_DIAMETER_INCHES * Math.PI * TICKS_PER_INCH * 1.82) / 360;
     private static final int MOVEMENT_DELAY_MS = 150;
 
-    static final double DISTANCE_THRESHOLD = 5.0;
-
-    // Arm and Lift Constants
+    // Arm Constants
     final double ARM_TICKS_PER_DEGREE = 28 * 250047.0 / 4913.0 * 42.0 / 10.0 / 360.0;
     final double ARM_COLLAPSED_INTO_ROBOT = 0;
     final double ARM_COLLECT = 10 * ARM_TICKS_PER_DEGREE;
-    final double ARM_FLAT = 30 * ARM_TICKS_PER_DEGREE;
     final double ARM_CLEAR_BARRIER = 15 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SPECIMEN = 90 * ARM_TICKS_PER_DEGREE;
 
+    // Lift Constants
     final double LIFT_TICKS_PER_MM = (111132.0 / 289.0) / 120.0;
     final double LIFT_COLLAPSED = 0 * LIFT_TICKS_PER_MM;
     final double LIFT_START = 50 * LIFT_TICKS_PER_MM;
+    final double LIFT_INTAKE = 400 * LIFT_TICKS_PER_MM;
 
-    final double DECELERATION_THRESHOLD = 200; // Ticks to start deceleration
-    final double MIN_VELOCITY = 0.2; // Minimum motor power near target
-    final double MAX_VELOCITY = 0.8; // Maximum motor power
+    // Arm Deceleration Constants
+    final double ARM_DECELERATION_THRESHOLD = 200; // Distance (ticks) to start decelerating
+    final double ARM_MIN_VELOCITY = 500; // Minimum velocity (ticks/sec) near the target
+    final double ARM_MAX_VELOCITY = 2100; // Maximum velocity (ticks/sec)
+
+    // Lift Deceleration Constants
+    final double LIFT_DECELERATION_THRESHOLD = 300; // Distance (ticks) to start decelerating
+    final double LIFT_MIN_VELOCITY = 300; // Minimum velocity (ticks/sec) near the target
+    final double LIFT_MAX_VELOCITY = 1000; // Maximum velocity (ticks/sec)
+
+    double armPosition = ARM_COLLAPSED_INTO_ROBOT;
+    double liftPosition = LIFT_START;
 
     @Override
     public void runOpMode() {
-
         // Initialize hardware
         leftFront = hardwareMap.get(DcMotor.class, "leftFrontDrive");
         leftRear = hardwareMap.get(DcMotor.class, "leftBackDrive");
@@ -62,52 +67,49 @@ public class AutonTest2 extends LinearOpMode {
         liftMotor = hardwareMap.get(DcMotorEx.class, "viperMotor");
         intake = hardwareMap.get(CRServo.class, "servoGripper");
         wrist = hardwareMap.get(Servo.class, "servoPivot");
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "frontDistanceSensor");
 
         // Configure motors
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         leftRear.setDirection(DcMotor.Direction.REVERSE);
-        armMotor.setDirection(DcMotor.Direction.REVERSE);
+        armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        // Wait for start
-        telemetry.addLine("Robot Ready.");
+        telemetry.addLine("Autonomous Ready.");
         telemetry.update();
         waitForStart();
 
-        // Set initial slide, intake, and arm positions
-        armMotor.setPosition(ARM_FLAT);
-        intake.setPower(INTAKE_OFF);
-        wrist.setPosition(WRIST_FOLDED_OUT);
-
-        // Autonomous movements
-        moveForward(24, 0.5); // Move forward 24 inches
-        turnRight(90, 0.5); // Turn right 90 degrees
-
-        while (opModeIsActive()) {
-            // Read and display distance sensor
-            double distance = distanceSensor.getDistance(DistanceUnit.CM);
-            telemetry.addData("Distance", distance);
-            telemetry.update();
-        }
+        // Autonomous sequence
+        moveForward(24, 0.5);
+        turnRight(90, 0.5);
+        setArmAndLiftToIntake();
+        moveForward(12, 0.3);
+        stopAllMotors();
     }
 
+    // Autonomous movement methods
     private void moveForward(double inches, double speed) {
         executeMovement(inches, speed, 1, 1, 1, 1);
     }
 
+    private void moveBackward(double inches, double speed) {
+        executeMovement(inches, speed, -1, -1, -1, -1);
+    }
+
+    private void turnLeft(double degrees, double speed) {
+        executeMovement(degrees * TICKS_PER_DEGREE, speed, -1, -1, 1, 1);
+    }
+
     private void turnRight(double degrees, double speed) {
-        int ticks = (int) (degrees * TICKS_PER_DEGREE);
-        executeMovement(ticks, speed, 1, 1, -1, -1);
+        executeMovement(degrees * TICKS_PER_DEGREE, speed, 1, 1, -1, -1);
     }
 
     private void executeMovement(double value, double speed, int lfDir, int lrDir, int rfDir, int rrDir) {
@@ -129,16 +131,10 @@ public class AutonTest2 extends LinearOpMode {
     private void decelerateMotors(int targetPosition, double maxSpeed) {
         while (opModeIsActive() &&
                 (leftFront.isBusy() && leftRear.isBusy() && rightFront.isBusy() && rightRear.isBusy())) {
-
             double currentPosition = Math.abs(leftFront.getCurrentPosition());
             double distanceToTarget = Math.abs(targetPosition - currentPosition);
-            double deceleratedSpeed = calculateDeceleration(distanceToTarget, DECELERATION_THRESHOLD, MIN_VELOCITY, maxSpeed);
-
+            double deceleratedSpeed = calculateDeceleration(distanceToTarget, ARM_DECELERATION_THRESHOLD, ARM_MIN_VELOCITY, maxSpeed);
             setMotorPowers(deceleratedSpeed);
-
-            telemetry.addData("Distance to Target", distanceToTarget);
-            telemetry.addData("Speed", deceleratedSpeed);
-            telemetry.update();
         }
         setMotorPowers(0);
     }
@@ -160,5 +156,24 @@ public class AutonTest2 extends LinearOpMode {
 
     private void delayAfterMovement() {
         sleep(MOVEMENT_DELAY_MS);
+    }
+
+    // Arm and Lift Functions
+    private void setArmAndLiftToIntake() {
+        armPosition = ARM_COLLECT;
+        liftPosition = LIFT_INTAKE;
+        armMotor.setTargetPosition((int) armPosition);
+        liftMotor.setTargetPosition((int) liftPosition);
+        ((DcMotorEx) armMotor).setVelocity(ARM_MAX_VELOCITY);
+        ((DcMotorEx) liftMotor).setVelocity(LIFT_MAX_VELOCITY);
+        intake.setPower(1.0); // Start intake
+    }
+
+    private void stopAllMotors() {
+        leftFront.setPower(0);
+        leftRear.setPower(0);
+        rightFront.setPower(0);
+        rightRear.setPower(0);
+        intake.setPower(0);
     }
 }
