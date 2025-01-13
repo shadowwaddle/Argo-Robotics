@@ -28,8 +28,13 @@ public class AnOldHope extends LinearOpMode {
     public Servo nodLeft = null;
 
     final double ARM_TICKS_PER_DEGREE = 28 * 250047.0 / 4913.0 * 42.0 / 10.0 / 360.0;
+    
+    final double ARM_HIGH_BASKET = 120 * ARM_TICKS_PER_DEGREE;
+    final double ARM_LOW_BASKET = 120 * ARM_TICKS_PER_DEGREE;
+    final double ARM_SPECIMEN = 60 * ARM_TICKS_PER_DEGREE;
+    
     final double ARM_COLLAPSED_INTO_ROBOT  = 0;
-    final double ARM_COLLECT               = 10 * ARM_TICKS_PER_DEGREE;
+    final double ARM_COLLECT               = 12 * ARM_TICKS_PER_DEGREE;
     final double ARM_CLEAR_BARRIER         = 15 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SPECIMEN        = 90 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SAMPLE_IN_LOW   = 90 * ARM_TICKS_PER_DEGREE;
@@ -73,8 +78,8 @@ public class AnOldHope extends LinearOpMode {
         }
     }
 
-    double gripPosition = 90;
-    double nodPosition = 90;
+    double gripPosition = 0.3;
+    double nodPosition = 0.5;
     boolean isIntaking = false;
     double armPosition = 0;
     double liftPosition = 0;
@@ -160,33 +165,25 @@ public class AnOldHope extends LinearOpMode {
                 intake.setPower(INTAKE_OFF);
             } */
             
-            if (gamepad1.left_bumper) {
-                nodPosition += 0.5;
-            } else if (gamepad1.right_bumper) {
-                nodPosition -= 0.5;
-            } else if (gamepad1.left_trigger > 0.4) {
-                nodPosition = 135;
-            } else if (gamepad1.right_trigger > 0.4) {
-                nodPosition = 45;
+            if (gamepad1.dpad_up) {
+            nodPosition = 0 * Math.PI; // Set nod position to 0 degrees
+            } else if (gamepad1.dpad_right) {
+                nodPosition = 0.18 * Math.PI; // Set nod position to 90 degrees
+            } else if (gamepad1.dpad_down) {
+                nodPosition = 0.25 * Math.PI; // Set nod position to 120 degrees
             }
+            
             nodLeft.setPosition(nodPosition);
-            nodRight.setPosition(180 - nodPosition);
-
-            // Wrist Position
-            /*
-            if (gamepad1.dpad_left) {
-                wrist.setPosition(WRIST_FOLDED_IN);
-            } else if (gamepad1.dpad_right) {
-                wrist.setPosition(WRIST_FOLDED_OUT);
-            } */
-            
-            if (gamepad1.dpad_left) {
-                gripPosition += 0.5;
-            } else if (gamepad1.dpad_right) {
-                gripPosition -= 0.5;
-            } 
-            grip.setPosition(gripPosition);
-            
+            nodRight.setPosition(1 - nodPosition); // Mirror position for the right servo
+        
+          // Grip Position Toggle
+          if (gamepad1.a) {
+            gripPosition = 0.5; // Open position
+          } else if (gamepad1.a) {
+            gripPosition = 0.75; // Closed position
+         }
+          grip.setPosition(gripPosition);
+                    
             
             
         
@@ -197,12 +194,15 @@ public class AnOldHope extends LinearOpMode {
                 //wrist.setPosition(WRIST_FOLDED_OUT);
                 //intake.setPower(INTAKE_COLLECT);
             } else if (gamepad2.y) {
-                armPosition = ARM_ATTACH_HANGING_HOOK;
+                armPosition = ARM_HIGH_BASKET;
                 isIntaking = false;
             } else if (gamepad2.x) {
-                armPosition = ARM_SCORE_SAMPLE_IN_LOW;
+                armPosition = ARM_LOW_BASKET;
                 isIntaking = false;
-            } else if (gamepad2.dpad_left) {
+            } else if (gamepad2.b) {
+                armPosition = ARM_SPECIMEN;
+                isIntaking = false;
+                } else if (gamepad2.dpad_left) {
                 /* This turns off the intake, folds in the wrist, and moves the arm
                 back to folded inside the robot. This is also the starting configuration */
                 armPosition = ARM_COLLAPSED_INTO_ROBOT;
@@ -243,9 +243,9 @@ public class AnOldHope extends LinearOpMode {
 
             // Lift Control with Trigger Adjustments
             if (gamepad2.right_trigger > 0) {
-                liftPosition += (50 * gamepad2.right_trigger); // Extend
+                liftPosition += (25 * gamepad2.right_trigger); // Extend
             } else if (gamepad2.left_trigger > 0) {
-                liftPosition -= (50 * gamepad2.left_trigger); // Retract
+                liftPosition -= (25 * gamepad2.left_trigger); // Retract
             }
 
             // Enforce lift boundaries
