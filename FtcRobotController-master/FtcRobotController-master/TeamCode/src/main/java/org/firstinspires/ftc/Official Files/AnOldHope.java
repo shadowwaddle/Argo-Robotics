@@ -144,8 +144,8 @@ public class AnOldHope extends LinearOpMode {
         if (gamepad2.a) intakeModeActive = true; // Activate intake mode
         if (gamepad2.x) intakeModeActive = false; // Deactivate intake mode
 
-        if (gamepad2.right_trigger > 0) liftPosition += 25 * gamepad2.right_trigger;
-        if (gamepad2.left_trigger > 0) liftPosition -= 25 * gamepad2.left_trigger;
+        if (gamepad2.right_trigger > 0) liftPosition += 15 * gamepad2.right_trigger;
+        if (gamepad2.left_trigger > 0) liftPosition -= 15 * gamepad2.left_trigger;
 
         liftPosition = Math.max(0, liftPosition);
 
@@ -158,23 +158,16 @@ public class AnOldHope extends LinearOpMode {
 
      private void handleArmControl() {
         if (gamepad2.a) {
-           
-            if (intakeModeActive) {
-                if (liftPosition == 17,000) {
-                    armPosition = 20 * ARM_TICKS_PER_DEGREE;
-                } if (liftPosition == 12,000) {
-                    armPosition = 20 * ARM_TICKS_PER_DEGREE;
-                }
-            }
-            
+        
             // lift position 18,000 20 degrees
             // lift position 12,000 15 degrees
             armPosition = 15 * ARM_TICKS_PER_DEGREE;
-            nodPosition = 0.03 * Math.PI;
+            liftPosition = 600;
+            nodPosition = 0.2 * Math.PI;
         }
         if (gamepad2.y) {
             armPosition = ARM_HIGH_BASKET;
-            liftPosition = 2000;
+            liftPosition = 24000;
             nodPosition = 0.35 * Math.PI;
         }
         if (gamepad2.x) {
@@ -196,6 +189,19 @@ public class AnOldHope extends LinearOpMode {
             armPosition = 75 * ARM_TICKS_PER_DEGREE;
             liftPosition = 0;
         }
+        
+         if (intakeModeActive) {
+        // Direct angle changes based on lift position
+        if (liftPosition <= 650) {
+            armPosition = 12 * ARM_TICKS_PER_DEGREE; // 12 degrees for liftPosition <= 650
+        } else if (liftPosition <= 1000) {
+            armPosition = 16 * ARM_TICKS_PER_DEGREE; // 16 degrees for 650 < liftPosition <= 1000
+        } else if (liftPosition <= 15000) {
+            armPosition = 19 * ARM_TICKS_PER_DEGREE; // 19 degrees for 1000 < liftPosition <= 15000
+        } else {
+            armPosition = 19 * ARM_TICKS_PER_DEGREE; // 19 degrees for liftPosition > 15000
+        }
+    }
 
         armPosition -= gamepad2.left_stick_y * 3; // Fine adjustment
 
