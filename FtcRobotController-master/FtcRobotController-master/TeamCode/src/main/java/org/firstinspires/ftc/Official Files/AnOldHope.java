@@ -40,7 +40,7 @@ public class AnOldHope extends LinearOpMode {
  
     // State variables
     
-    private double armPosition = DEFAULT_ARM_ANGLE * ARM_TICKS_PER_DEGREE;
+    private double armPosition = 20 * ARM_TICKS_PER_DEGREE;
     private double liftPosition = LIFT_START;
     private double nodPosition = 0;
     private boolean intakeModeActive = false;
@@ -127,14 +127,14 @@ public class AnOldHope extends LinearOpMode {
     }
 
     private void handleGripControl() {
-        if (gamepad1.a) grip.setPosition(0.5); // Open
-        if (gamepad1.b) grip.setPosition(0.75); // Closed
+        if (gamepad1.right_bumper) grip.setPosition(0.5); // Open
+        if (gamepad1.left_bumper) grip.setPosition(0.74); // Closed
     }
 
     private void handleNodControl() {
-        if (gamepad1.dpad_up) nodPosition = 0 * Math.PI;
-        if (gamepad1.dpad_right) nodPosition = 0.18 * Math.PI;
-        if (gamepad1.dpad_down) nodPosition = 0.25 * Math.PI;
+        if (gamepad1.dpad_up) nodPosition = 0.35 * Math.PI;
+        if (gamepad1.dpad_right) nodPosition = 0.2 * Math.PI;
+        if (gamepad1.dpad_down) nodPosition = 0.03 * Math.PI;
 
         nodLeft.setPosition(nodPosition);
         nodRight.setPosition(1 - nodPosition);
@@ -157,24 +157,44 @@ public class AnOldHope extends LinearOpMode {
     }
 
      private void handleArmControl() {
-        if (gamepad2.a) armPosition = 15 * ARM_TICKS_PER_DEGREE;
+        if (gamepad2.a) {
+           
+            if (intakeModeActive) {
+                if (liftPosition == 17,000) {
+                    armPosition = 20 * ARM_TICKS_PER_DEGREE;
+                } if (liftPosition == 12,000) {
+                    armPosition = 20 * ARM_TICKS_PER_DEGREE;
+                }
+            }
+            
+            // lift position 18,000 20 degrees
+            // lift position 12,000 15 degrees
+            armPosition = 15 * ARM_TICKS_PER_DEGREE;
+            nodPosition = 0.03 * Math.PI;
+        }
         if (gamepad2.y) {
             armPosition = ARM_HIGH_BASKET;
             liftPosition = 2000;
+            nodPosition = 0.35 * Math.PI;
         }
         if (gamepad2.x) {
             armPosition = 20 * ARM_TICKS_PER_DEGREE;
             liftPosition = 0;
+            nodPosition = 0.35 * Math.PI;
         }
         if (gamepad2.dpad_down) {
-            armPosition = 10.5 * ARM_TICKS_PER_DEGREE;
+            armPosition = 11 * ARM_TICKS_PER_DEGREE;
             liftPosition = 250;
-            nodPosition = 0.25 * Math.PI;
+            nodPosition = 0.17 * Math.PI;
         }
         if (gamepad2.dpad_up) {
-            armPosition = 90 * ARM_TICKS_PER_DEGREE;
-            liftPosition = 500;
-            nodPosition = 0.18 * Math.PI;
+            armPosition = 91 * ARM_TICKS_PER_DEGREE;
+            liftPosition = 200;
+            nodPosition = 0.2 * Math.PI;
+        }
+        if (gamepad2.dpad_right) {
+            armPosition = 75 * ARM_TICKS_PER_DEGREE;
+            liftPosition = 0;
         }
 
         armPosition -= gamepad2.left_stick_y * 3; // Fine adjustment
@@ -202,6 +222,7 @@ public class AnOldHope extends LinearOpMode {
         telemetry.addData("Lift Position", liftPosition);
         telemetry.addData("Arm Position", armPosition);
         telemetry.addData("Intake Mode", intakeModeActive);
+        telemetry.addData("Arm degrees", armPosition / ARM_TICKS_PER_DEGREE);
         telemetry.update();
     }
 }
