@@ -102,18 +102,24 @@ public class AnOldHope extends LinearOpMode {
     }
 
     private void handleChassisControl() {
-        double axial = -gamepad1.left_stick_y;
-        double lateral = gamepad1.left_stick_x;
-        double yaw = gamepad1.right_stick_x;
+    double axial = -gamepad1.left_stick_y;  // Forward/backward movement
+    double lateral = gamepad1.left_stick_x; // Strafing movement
+    double yaw = gamepad1.right_stick_x;    // Turning movement
 
-        double leftFrontPower = axial - lateral + yaw;
-        double rightFrontPower = axial + lateral - yaw;
-        double leftBackPower = axial + lateral + yaw;
-        double rightBackPower = axial - lateral - yaw;
+    // Original motor power calculation
+    double leftFrontPower = axial - lateral + yaw;
+    double rightFrontPower = axial + lateral - yaw;
+    double leftBackPower = axial + lateral + yaw;
+    double rightBackPower = axial - lateral - yaw;
 
-        normalizeAndSetMotorPower(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
-    }
+    // Adjust the back wheels' power with a scaling factor
+    double backWheelScalingFactor = 0.8; // Reduce power to back wheels (tweak this value as needed)
+    leftBackPower *= backWheelScalingFactor;
+    rightBackPower *= backWheelScalingFactor;
 
+    // Normalize and set motor power
+    normalizeAndSetMotorPower(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
+}
     private void normalizeAndSetMotorPower(double... powers) {
         double max = 1.0;
         for (double power : powers) max = Math.max(max, Math.abs(power));
