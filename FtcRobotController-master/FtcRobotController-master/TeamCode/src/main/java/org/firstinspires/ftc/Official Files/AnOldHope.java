@@ -127,14 +127,14 @@ public class AnOldHope extends LinearOpMode {
     }
 
     private void handleGripControl() {
-        if (gamepad1.right_bumper) grip.setPosition(0.5); // Open
-        if (gamepad1.left_bumper) grip.setPosition(0.74); // Closed
+        if (gamepad2.right_bumper) grip.setPosition(0.2); // Open
+        if (gamepad2.left_bumper) grip.setPosition(0.74); // Closed
     }
 
     private void handleNodControl() {
         if (gamepad1.dpad_up) nodPosition = 0.35 * Math.PI;
         if (gamepad1.dpad_right) nodPosition = 0.2 * Math.PI;
-        if (gamepad1.dpad_down) nodPosition = 0.03 * Math.PI;
+        if (gamepad1.dpad_down) nodPosition = 0.05 * Math.PI;
 
         nodLeft.setPosition(nodPosition);
         nodRight.setPosition(1 - nodPosition);
@@ -163,7 +163,7 @@ public class AnOldHope extends LinearOpMode {
             // lift position 12,000 15 degrees
             armPosition = 15 * ARM_TICKS_PER_DEGREE;
             liftPosition = 600;
-            nodPosition = 0.2 * Math.PI;
+            nodPosition = 0.05 * Math.PI;
         }
         if (gamepad2.y) {
             armPosition = ARM_HIGH_BASKET;
@@ -173,12 +173,12 @@ public class AnOldHope extends LinearOpMode {
         if (gamepad2.x) {
             armPosition = 20 * ARM_TICKS_PER_DEGREE;
             liftPosition = 0;
-            nodPosition = 0.35 * Math.PI;
+            nodPosition = 0.2 * Math.PI;
         }
         if (gamepad2.dpad_down) {
-            armPosition = 11 * ARM_TICKS_PER_DEGREE;
-            liftPosition = 250;
-            nodPosition = 0.17 * Math.PI;
+            armPosition = 12 * ARM_TICKS_PER_DEGREE;
+            liftPosition = 270;
+            nodPosition = 0.2 * Math.PI;
         }
         if (gamepad2.dpad_up) {
             armPosition = 91 * ARM_TICKS_PER_DEGREE;
@@ -191,6 +191,8 @@ public class AnOldHope extends LinearOpMode {
         }
         
          if (intakeModeActive) {
+            armPosition -= gamepad2.left_stick_y * 3; // Fine adjustment
+
         // Direct angle changes based on lift position
         if (liftPosition <= 650) {
             armPosition = 12 * ARM_TICKS_PER_DEGREE; // 12 degrees for liftPosition <= 650
