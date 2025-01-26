@@ -134,7 +134,7 @@ public class AnOldHope extends LinearOpMode {
 
     private void handleGripControl() {
         if (gamepad1.right_bumper) grip.setPosition(0.2); // Open
-        if (gamepad1.left_bumper) grip.setPosition(0.74); // Closed
+        if (gamepad1.left_bumper) grip.setPosition(0.62); // Closed
     }
 
     private void handleNodControl() {
@@ -159,14 +159,14 @@ public class AnOldHope extends LinearOpMode {
 
         liftMotor.setTargetPosition((int) liftPosition);
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        liftMotor.setPower(1.0);
+        liftMotor.setPower(0.75);
     }
 
     private void handleArmControl() {
     // Turn intake mode ON when `gamepad2.a` is pressed and move the arm to the intake position
     if (gamepad2.a) {
         intakeModeActive = true; // Enable intake mode
-        armPosition = 20 * ARM_TICKS_PER_DEGREE; // Move arm to intake position
+        armPosition = 18 * ARM_TICKS_PER_DEGREE; // Move arm to intake position
         liftPosition = 600; // Set lift position for intake
         nodPosition = 0.05 * Math.PI; // Optional: adjust nod position
     }
@@ -177,30 +177,34 @@ public class AnOldHope extends LinearOpMode {
         armPosition = 20 * ARM_TICKS_PER_DEGREE;
         liftPosition = 0;
         nodPosition = 0.2 * Math.PI;
+        
     }
 
     // Preset arm positions for other specific inputs
     if (gamepad2.y) {
-        armPosition = 130 * ARM_TICKS_PER_DEGREE;
+        armPosition = 120 * ARM_TICKS_PER_DEGREE;
         liftPosition = 2400;
         nodPosition = 0.35 * Math.PI;
     } else if (gamepad2.dpad_down) {
-        armPosition = 5 * ARM_TICKS_PER_DEGREE;
+        armPosition = 5.5 * ARM_TICKS_PER_DEGREE;
         liftPosition = 200;
         nodPosition = 0.23 * Math.PI;
     } else if (gamepad2.dpad_up) {
-        armPosition = 91 * ARM_TICKS_PER_DEGREE;
+        armPosition = 85 * ARM_TICKS_PER_DEGREE;
         liftPosition = 0;
         nodPosition = 0.2 * Math.PI;
     } else if (gamepad2.dpad_right) {
-        armPosition = 80 * ARM_TICKS_PER_DEGREE;
+        armPosition = 65 * ARM_TICKS_PER_DEGREE;
         liftPosition = 0;
         nodPosition = 0.2 * Math.PI;
     }
     
-    // Manual Adjust
+    if (intakeModeActive == false) {
+        // Manual Adjust
     if (gamepad2.left_bumper) armPosition -= 10; // Decrease arm position
     if (gamepad2.right_bumper) armPosition += 10 ; // Increase arm position
+    }
+    
     
     // Adjust arm position while intaking (fine control)
     if (intakeModeActive) {
