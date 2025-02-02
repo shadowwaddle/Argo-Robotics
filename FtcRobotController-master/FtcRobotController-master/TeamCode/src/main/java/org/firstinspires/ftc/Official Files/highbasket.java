@@ -1,235 +1,286 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 
-@Autonomous(name="AutonTest2", group="Autonomous")
-public class AutonTest2 extends LinearOpMode {
+@Autonomous(name = "OneHighBasket", group = "Linear OpMode")
+public class OneHighBasket extends LinearOpMode {
 
-    private DcMotor leftFront;
-    private DcMotor leftRear;
-    private DcMotor rightFront;
-    private DcMotor rightRear;
-    private DcMotorEx armMotor;
-    private DcMotorEx liftMotor;
-    private CRServo intake;
-    private Servo wrist;
+    // Hardware components
+    private DcMotor leftFrontDrive, rightFrontDrive, leftBackDrive, rightBackDrive;
+    private DcMotor armMotor, liftMotor;
+    private Servo grip, nodRight, nodLeft;
 
-    // Movement Constants
-    private static final double TICKS_PER_REVOLUTION = 537.6;
-    private static final double WHEEL_DIAMETER_INCHES = 3.77;
-    private static final double ROBOT_DIAMETER_INCHES = 16.0;
+    // Constants
+    private static final double ARM_TICKS_PER_DEGREE = 28 * 250047.0 / 4913.0 * 42.0 / 10.0 / 360.0;
+    private static final double LIFT_TICKS_PER_MM = (111132.0 / 289.0) / 120.0;
 
-    private static final double TICKS_PER_INCH = (TICKS_PER_REVOLUTION) / (Math.PI * WHEEL_DIAMETER_INCHES);
-    private static final double TICKS_PER_DEGREE = (ROBOT_DIAMETER_INCHES * Math.PI * TICKS_PER_INCH * 1.1) / 360;
-    private static final int MOVEMENT_DELAY_MS = 300;
+    private static final double ARM_HIGH_BASKET = 120 * ARM_TICKS_PER_DEGREE;
+    private static final double ARM_LOW_BASKET = 120 * ARM_TICKS_PER_DEGREE;
+    private static final double ARM_SPECIMEN = 60 * ARM_TICKS_PER_DEGREE;
+    private static final double ARM_COLLAPSED_INTO_ROBOT = 0;
+    private static final double ARM_COLLECT = 20 * ARM_TICKS_PER_DEGREE;
 
-    // Arm Constants
-    final double ARM_TICKS_PER_DEGREE = 28 * 250047.0 / 4913.0 * 42.0 / 10.0 / 360.0;
-    final double ARM_COLLAPSED_INTO_ROBOT = 0;
-    final double ARM_COLLECT = 6 * ARM_TICKS_PER_DEGREE;
-    final double ARM_START = 20 * ARM_TICKS_PER_DEGREE;
-    final double ARM_SCORE_SPECIMEN = 90 * ARM_TICKS_PER_DEGREE;
-    final double ARM_HIGH_BASKET = 95 * ARM_TICKS_PER_DEGREE;
-
-    // Wrist Constants
-    final double WRIST_FOLDED_IN = 1.0;
-    final double WRIST_FOLDED_OUT = 0.7;
-
-    // Lift Constants
-    final double LIFT_TICKS_PER_MM = (111132.0 / 289.0) / 120.0;
-    final double LIFT_COLLAPSED = 0 * LIFT_TICKS_PER_MM;
-    final double LIFT_SHORT = 90 * LIFT_TICKS_PER_MM;
-    final double LIFT_INTAKE = 400 * LIFT_TICKS_PER_MM;
-    final double LIFT_SCORING_IN_HIGH_BASKET = 500 * LIFT_TICKS_PER_MM;
-
-    double armPosition = ARM_COLLAPSED_INTO_ROBOT;
-    double liftPosition = LIFT_COLLAPSED;
+    private static final double LIFT_COLLAPSED = 0 * LIFT_TICKS_PER_MM;
+    private static final double LIFT_START = 0 * LIFT_TICKS_PER_MM;
+    private static final double LIFT_INTAKE = 500 * LIFT_TICKS_PER_MM;
+    
+    // State variables (Moved outside runOpMode)
+private double armPosition = 20 * ARM_TICKS_PER_DEGREE;
+private double liftPosition = LIFT_START;
+private double nodPosition = 0;
 
     @Override
     public void runOpMode() {
-        // Initialize hardware
         initializeHardware();
-
         telemetry.addLine("Autonomous Ready.");
         telemetry.update();
 
         waitForStart();
 
-        // Initial setup: arm to collect, lift to intake
-        setArmAndLiftToStart();
-
-        strafeLeft(10, 0.5);
-        setArmToDrop(); 
-        moveForward(20, 0.5);
-        turnLeft(95, 0.5);
-        moveForward(6, 0.5);
-        intake.setPower(-1);
-        sleep(3000);
-        moveBackward(10, 0.5);
-        sleep(1000);
-        setArmAndLiftToStart();
-        sleep(1000);
-        
+        if (opModeIsActive()) {
+           closeGrip();
+           dropOff();
+           moveBackward(700, 0.5);
+            openGrip();
+            sleep(2000);
+           moveForward(300, 0.5);
+           drive();
+           sleep(1000);
+           reset();
+           // strafe(800,0.6,true);
+            //moveForward(500, 0.6); // Move forward for 1000 encoder ticks
+        }
     }
 
     private void initializeHardware() {
-        leftFront  = hardwareMap.get(DcMotor.class, "leftFrontDrive");
-        leftRear   = hardwareMap.get(DcMotor.class, "leftBackDrive");
-        rightFront = hardwareMap.get(DcMotor.class, "rightFrontDrive");
-        rightRear  = hardwareMap.get(DcMotor.class, "rightBackDrive");
-        armMotor   = hardwareMap.get(DcMotorEx.class, "armMotor");
-        liftMotor  = hardwareMap.get(DcMotorEx.class, "viperMotor");
-        intake     = hardwareMap.get(CRServo.class, "servoGripper");
-        wrist      = hardwareMap.get(Servo.class, "servoPivot");
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "leftFrontDrive");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "leftBackDrive");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFrontDrive");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "rightBackDrive");
+        armMotor = hardwareMap.get(DcMotor.class, "armMotor");
+        liftMotor = hardwareMap.dcMotor.get("viperMotor");
+        grip = hardwareMap.get(Servo.class, "grip");
+        nodRight = hardwareMap.get(Servo.class, "nodRight");
+        nodLeft = hardwareMap.get(Servo.class, "nodLeft");
 
-        // Motor directions
-        leftFront.setDirection(DcMotor.Direction.REVERSE);
-        leftRear.setDirection(DcMotor.Direction.REVERSE);
-        armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        liftMotor.setDirection(DcMotor.Direction.REVERSE);
+        armMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        // Motor zero power behavior
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        // Reset encoders
+        resetEncoders();
+    }
+
+    private void resetEncoders() {
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
-    // Autonomous movement methods
-    private void moveForward(double inches, double speed) {
-        int ticks = (int) (inches * TICKS_PER_INCH);
-        setTargetPosition(leftFront, ticks);
-        setTargetPosition(leftRear, ticks);
-        setTargetPosition(rightFront, ticks);
-        setTargetPosition(rightRear, ticks);
-        setMotorPowers(speed);
+    private void moveForward(int ticks, double power) {
+        setDriveTarget(ticks);
+        setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+        setDrivePower(power);
         waitForMotors();
-        delayAfterMovement();
     }
 
-    private void moveBackward(double inches, double speed) {
-        moveForward(-inches, speed);
+    private void moveBackward(int ticks, double power) {
+        setDriveTarget(-ticks);
+        setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+        setDrivePower(power);
+        waitForMotors();
     }
     
-    private void strafeLeft(double inches, double speed) {
-        int ticks = (int) (inches * TICKS_PER_INCH);
+    private void turnLeft(int ticks, double power) {
+    leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() - ticks);
+    rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() + ticks);
+    leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() - ticks);
+    rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + ticks);
 
-        setTargetPosition(leftFront, -ticks);
-        setTargetPosition(leftRear, ticks);
-        setTargetPosition(rightFront, ticks);
-        setTargetPosition(rightRear, -ticks);
+    setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+    setDrivePower(power);
+    waitForMotors();
+}
 
-        setMotorPowers(speed);
+    private void turnRight(int ticks, double power) {
+        leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() + ticks);
+        rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() - ticks);
+        leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + ticks);
+        rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() - ticks);
+
+        setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+        setDrivePower(power);
         waitForMotors();
-        delayAfterMovement();
+    }
+    
+    private void strafe(int ticks, double power, boolean right) {
+    // Strafe right: Left wheels move forward, Right wheels move backward
+    // Strafe left: Left wheels move backward, Right wheels move forward
+    int direction = right ? 1 : -1;
+
+    leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() + (ticks * direction));
+    rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() - (ticks * direction));
+    leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() - (ticks * direction));
+    rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + (ticks * direction));
+
+    setDriveMode(DcMotor.RunMode.RUN_TO_POSITION);
+    setDrivePower(power);
+    waitForMotors();
     }
 
-    private void strafeRight(double inches, double speed) {
-        int ticks = (int) (inches * TICKS_PER_INCH);
-
-        setTargetPosition(leftFront, ticks);
-        setTargetPosition(leftRear, -ticks);
-        setTargetPosition(rightFront, -ticks);
-        setTargetPosition(rightRear, ticks);
-
-        setMotorPowers(speed);
-        waitForMotors();
-        delayAfterMovement();
+    private void setDriveTarget(int ticks) {
+        leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() + ticks);
+        rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() + ticks);
+        leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + ticks);
+        rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + ticks);
     }
 
-    private void turnLeft(double degrees, double speed) {
-        int ticks = (int) (degrees * TICKS_PER_DEGREE);
-        setTargetPosition(leftFront, -ticks);
-        setTargetPosition(leftRear, -ticks);
-        setTargetPosition(rightFront, ticks);
-        setTargetPosition(rightRear, ticks);
-        setMotorPowers(speed);
-        waitForMotors();
-        delayAfterMovement();
+    private void setDriveMode(DcMotor.RunMode mode) {
+        leftFrontDrive.setMode(mode);
+        rightFrontDrive.setMode(mode);
+        leftBackDrive.setMode(mode);
+        rightBackDrive.setMode(mode);
     }
 
-    private void turnRight(double degrees, double speed) {
-        turnLeft(-degrees, speed);
-    }
-
-    private void setTargetPosition(DcMotor motor, int position) {
-        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motor.setTargetPosition(position);
-        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
-
-    private void setMotorPowers(double power) {
-        leftFront.setPower(power);
-        leftRear.setPower(power);
-        rightFront.setPower(power);
-        rightRear.setPower(power);
+    private void setDrivePower(double power) {
+        leftFrontDrive.setPower(power);
+        rightFrontDrive.setPower(power);
+        leftBackDrive.setPower(power);
+        rightBackDrive.setPower(power);
     }
 
     private void waitForMotors() {
-        while (opModeIsActive() && 
-              (leftFront.isBusy() && leftRear.isBusy() && rightFront.isBusy() && rightRear.isBusy())) {
-            telemetry.addData("Status", "Motors Moving");
+        while (opModeIsActive() &&
+                (leftFrontDrive.isBusy() || rightFrontDrive.isBusy() ||
+                leftBackDrive.isBusy() || rightBackDrive.isBusy())) {
+            telemetry.addLine("Moving...");
             telemetry.update();
         }
-        setMotorPowers(0);
+        setDrivePower(0);
     }
+    
+    private void dropOff() {
+    liftPosition = 2200;
+    armPosition = 120 * ARM_TICKS_PER_DEGREE;
+    nodPosition = 0.35 * Math.PI;
 
-    private void delayAfterMovement() {
-        sleep(MOVEMENT_DELAY_MS);
-    }
+    // Set target positions
+    armMotor.setTargetPosition((int) armPosition);
+    liftMotor.setTargetPosition((int) liftPosition);
 
-    // Arm and Lift Functions
-    private void setArmAndLiftToStart() {
-        wrist.setPosition(WRIST_FOLDED_OUT);
-        armPosition = ARM_START;
-        liftPosition = LIFT_SHORT;
-        updateArmAndLift();
-    }
+    // Run motors to position
+    armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-    private void setArmAndLiftToIntake() {
-        wrist.setPosition(WRIST_FOLDED_OUT);
-        armPosition = ARM_COLLECT;
-        liftPosition = LIFT_SHORT;
-        updateArmAndLift();
-        intake.setPower(1.0);
-    }
+    armMotor.setPower(1.0);
+    liftMotor.setPower(1.0);
 
-    private void setArmToDrop() {
-        armPosition = ARM_HIGH_BASKET;
-        liftPosition = LIFT_SCORING_IN_HIGH_BASKET;
-        updateArmAndLift();
-    }
+    // Move nod servos after both lift and arm movements start
+    nodLeft.setPosition(nodPosition);
+    nodRight.setPosition(1 - nodPosition);
+}
 
-    private void updateArmAndLift() {
-        armMotor.setTargetPosition((int) armPosition);
+private void drive() {
+    armPosition = 20 * ARM_TICKS_PER_DEGREE;
+    liftPosition = 0;
+    nodPosition = 0.2 * Math.PI;
+
+    // Set target positions
+    armMotor.setTargetPosition((int) armPosition);
+    liftMotor.setTargetPosition((int) liftPosition);
+
+    // Run motors to position
+    armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+    armMotor.setPower(1.0);
+    liftMotor.setPower(1.0);
+
+    // Move nod servos after both lift and arm movements start
+    nodLeft.setPosition(nodPosition);
+    nodRight.setPosition(1 - nodPosition);
+}
+private void pickUp() {
+    armPosition = 5.0 * ARM_TICKS_PER_DEGREE;
+    liftPosition = 210;
+    nodPosition = 0.19 * Math.PI;
+
+    // Set target positions
+    armMotor.setTargetPosition((int) armPosition);
+    liftMotor.setTargetPosition((int) liftPosition);
+
+    // Run motors to position
+    armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+    armMotor.setPower(1.0);
+    liftMotor.setPower(1.0);
+
+    // Move nod servos after both lift and arm movements start
+    nodLeft.setPosition(nodPosition);
+    nodRight.setPosition(1 - nodPosition);
+}
+private void reset() {
+    armPosition = 0 * ARM_TICKS_PER_DEGREE;
+    liftPosition = 0;
+    nodPosition = 0.20 * Math.PI;
+
+    // Set target positions
+    armMotor.setTargetPosition((int) armPosition);
+    liftMotor.setTargetPosition((int) liftPosition);
+
+    // Run motors to position
+    armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+    armMotor.setPower(1.0);
+    liftMotor.setPower(1.0);
+
+    // Move nod servos after both lift and arm movements start
+    nodLeft.setPosition(nodPosition);
+    nodRight.setPosition(1 - nodPosition);
+}
+
+
+    private void moveArmToPosition(double position) {
+        armMotor.setTargetPosition((int) position);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armMotor.setPower(0.8);
-
-        liftMotor.setTargetPosition((int) liftPosition);
-        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        liftMotor.setPower(0.7);
+        ((DcMotorEx) armMotor).setVelocity(2100);
+        while (opModeIsActive() && armMotor.isBusy()) {
+            telemetry.addData("Moving Arm", armMotor.getCurrentPosition());
+            telemetry.update();
+        }
     }
 
-    private void stopAllMotors() {
-        leftFront.setPower(0);
-        leftRear.setPower(0);
-        rightFront.setPower(0);
-        rightRear.setPower(0);
-        armMotor.setPower(0);
-        liftMotor.setPower(0);
-        intake.setPower(0);
+    private void moveLiftToPosition(double position) {
+        liftMotor.setTargetPosition((int) position);
+        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        liftMotor.setPower(0.75);
+        while (opModeIsActive() && liftMotor.isBusy()) {
+            telemetry.addData("Moving Lift", liftMotor.getCurrentPosition());
+            telemetry.update();
+        }
+    }
+
+    private void openGrip() {
+        grip.setPosition(0.2);
+    }
+
+    private void closeGrip() {
+        grip.setPosition(0.64);
     }
 }
